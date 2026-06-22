@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Telefonassistent für Ihren Betrieb · Simon Brändle, Allgäu</title>
+  <meta name="description" content="Ein Telefonassistent, der Ihre Anrufe annimmt, wiederkehrende Fragen beantwortet und Termine festhält. Rund um die Uhr, in Ihrem Namen, DSGVO-konform. Kostenlos testen." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── TOKENS ── */
+    :root {
+      --paper:       #f4f2ec;
+      --surface:     #fdfbf7;
+      --ink:         #1c2022;
+      --muted:       #58636b;
+      --accent:      #1e6b52;
+      --accent-soft: #cce8dd;
+      --line:        #e1dace;
+      --max:         1080px;
+      --r:           12px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { background: var(--paper); scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 1.0625rem;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3 {
+      font-family: "Newsreader", Georgia, serif;
+      font-weight: 500;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+      text-wrap: balance;
+    }
+
+    /* ── LAYOUT ── */
+    .wrap {
+      width: 100%;
+      max-width: var(--max);
+      margin-inline: auto;
+      padding-inline: 1.5rem;
+    }
+    .narrow { max-width: 700px; }
+
+    /* ── HEADER / NAV ── */
+    .site-header {
+      border-bottom: 1px solid var(--line);
+      background: var(--paper);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-block: .9rem;
+      gap: 1rem;
+    }
+    .nav-logo {
+      font-family: "Newsreader", Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: .25rem;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+    .nav-links a {
+      font-size: .88rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      padding: .35rem .7rem;
+      border-radius: 6px;
+      transition: background .15s ease, color .15s ease;
+    }
+    .nav-links a:hover {
+      background: var(--line);
+      color: var(--ink);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding-top: 5rem;
+      padding-bottom: 4.5rem;
+      text-align: center;
+    }
+    .hero-inner {
+      max-width: 620px;
+      margin-inline: auto;
+    }
+    .eyebrow {
+      display: inline-block;
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.1rem);
+      line-height: 1.15;
+      margin-bottom: 1.1rem;
+    }
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--muted);
+      margin-bottom: 2.75rem;
+    }
+
+    /* ── DEMO BUTTON ── */
+    .demo-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+    }
+    .btn-call {
+      display: inline-flex;
+      align-items: center;
+      gap: .65rem;
+      background: var(--accent);
+      color: #fdfdfb;
+      border: none;
+      border-radius: 999px;
+      padding: 1rem 2.25rem;
+      font-family: inherit;
+      font-size: 1.0625rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .18s ease, transform .12s ease;
+    }
+    .btn-call:hover  { background: #185c45; }
+    .btn-call:active { transform: translateY(1px); }
+    .btn-call:focus-visible {
+      outline: 3px solid rgba(30,107,82,.35);
+      outline-offset: 4px;
+    }
+    .btn-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      flex-shrink: 0;
+    }
+    .is-hidden { display: none !important; }
+    .demo-hint {
+      max-width: 440px;
+      color: var(--muted);
+      font-size: .93rem;
+      line-height: 1.5;
+    }
+
+    /* ── CALL OVERLAY ── */
+    .call-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .55);
+      z-index: 998;
+      backdrop-filter: blur(2px);
+    }
+    .call-overlay.active { display: flex; align-items: flex-end; justify-content: center; padding-bottom: 2rem; }
+    .btn-hangup-overlay {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      background: #c0392b;
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: .85rem 2rem;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      z-index: 999;
+      transition: background .15s ease;
+      box-shadow: 0 4px 20px rgba(0,0,0,.35);
+    }
+    .btn-hangup-overlay:hover { background: #a93226; }
+
+    /* ── AKTIVER ANRUF ── */
+    .call-active {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.1rem;
+    }
+    .call-active.visible { display: flex; }
+    .call-status {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .call-status-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: blink 1.4s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .3; }
+    }
+    .call-note {
+      font-size: .9rem;
+      color: var(--muted);
+    }
+    .btn-hangup {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      background: #c0392b;
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: .75rem 1.75rem;
+      font-family: inherit;
+      font-size: .97rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s ease;
+    }
+    .btn-hangup:hover { background: #a93226; }
+    .btn-hangup svg  { flex-shrink: 0; }
+
+    /* ── SECTIONS ── */
+    .section {
+      padding-block: 4.5rem;
+      border-top: 1px solid var(--line);
+    }
+    .section-quiet   { background: var(--surface); }
+    .section-contact { padding-bottom: 5.5rem; }
+
+    .section-title {
+      font-size: clamp(1.5rem, 3vw, 1.9rem);
+      margin-bottom: 2.25rem;
+    }
+    .narrow .section-title { margin-bottom: 1.4rem; }
+
+    .lead {
+      font-size: 1.1rem;
+      color: var(--ink);
+      margin-bottom: 1.1rem;
+    }
+    .lead:last-child { margin-bottom: 0; }
+
+    /* ── CASES ── */
+    .cases {
+      display: grid;
+      gap: 1.25rem;
+      grid-template-columns: 1fr;
+    }
+    .case {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .case-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      filter: grayscale(25%) contrast(1.05);
+    }
+    .case-body {
+      padding: 1.6rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      flex: 1;
+    }
+    .case-problem { /* no extra styles needed */ }
+    .case-divider {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      color: var(--muted);
+      font-size: .8rem;
+      font-weight: 500;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .case-divider::before,
+    .case-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+    .case-solution { color: var(--muted); }
+
+    /* ── TRUST ── */
+    .trust {
+      list-style: none;
+      display: grid;
+      gap: 1.4rem;
+      grid-template-columns: 1fr;
+    }
+    .trust-item {
+      display: flex;
+      flex-direction: column;
+      gap: .35rem;
+      padding-left: 1.1rem;
+      border-left: 2px solid var(--accent);
+    }
+    .trust-head { font-weight: 600; font-size: 1.05rem; }
+    .trust-body { color: var(--muted); }
+
+    /* ── FAQ ── */
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: .6rem;
+    }
+    details.faq-item {
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: var(--surface);
+      overflow: hidden;
+    }
+    details.faq-item[open] {
+      border-color: var(--accent-soft);
+    }
+    summary.faq-q {
+      padding: 1.15rem 1.4rem;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      user-select: none;
+    }
+    summary.faq-q::-webkit-details-marker { display: none; }
+    summary.faq-q::after {
+      content: "+";
+      font-size: 1.3rem;
+      font-weight: 400;
+      color: var(--accent);
+      flex-shrink: 0;
+      transition: transform .2s ease;
+      line-height: 1;
+    }
+    details[open] summary.faq-q::after {
+      transform: rotate(45deg);
+    }
+    .faq-a {
+      padding: 0 1.4rem 1.25rem;
+      color: var(--muted);
+      font-size: .97rem;
+      line-height: 1.65;
+    }
+
+    /* ── CONTACT ── */
+    .contacts {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1.75rem;
+    }
+    .contact-link {
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 1.05rem;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color .15s ease;
+    }
+    .contact-link:hover { border-color: var(--accent); }
+    .contact-sep {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--line);
+      flex-shrink: 0;
+    }
+
+    /* ── FOOTER ── */
+    .site-footer {
+      border-top: 1px solid var(--line);
+      background: var(--paper);
+    }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: .5rem;
+      padding-block: 1.5rem;
+      font-size: .88rem;
+      color: var(--muted);
+    }
+
+    /* ── SCROLL FADE-IN ── */
+    .fade {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .fade.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (min-width: 680px) {
+      .cases { grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+      .trust { grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+      .trust-item {
+        border-left: none;
+        border-top: 2px solid var(--accent);
+        padding-left: 0;
+        padding-top: 1rem;
+      }
+    }
+    @media (min-width: 900px) {
+      .section { padding-block: 5.5rem; }
+    }
+    @media (max-width: 520px) {
+      .nav-links { gap: 0; }
+      .nav-links a { padding: .3rem .5rem; font-size: .82rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .btn-call { transition: none; }
+      .fade { opacity: 1; transform: none; transition: none; }
+      details.faq-item summary.faq-q::after { transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="site-header">
+  <div class="wrap nav-inner">
+    <a href="#" class="nav-logo">KI-Telefonassistent</a>
+    <nav aria-label="Seitennavigation">
+      <ul class="nav-links">
+        <li><a href="#demo">Demo</a></li>
+        <li><a href="#situationen">Wie es hilft</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#kontakt">Kontakt</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="wrap hero-inner">
+      <span class="eyebrow">Für lokale Betriebe im Allgäu</span>
+      <h1>Geht bei Ihnen manchmal ein Anruf unter?</h1>
+      <p class="hero-sub">So könnte es bei Ihnen am Telefon klingen.</p>
+
+      <div class="demo-stage" id="demo">
+        <button class="btn-call" id="startCall" type="button" aria-describedby="demoHint">
+          <span class="btn-dot" aria-hidden="true"></span>
+          Anruf starten
+        </button>
+        <p class="demo-hint" id="demoHint">
+          Dauert einen Moment. Sprechen Sie einfach so, wie Sie mit einem Mitarbeiter reden würden.
+        </p>
+
+        <div class="call-active" id="callActive" aria-live="polite">
+          <div class="call-status">
+            <span class="call-status-dot" aria-hidden="true"></span>
+            Gespräch läuft
+          </div>
+          <p class="call-note">Das Gesprächsfenster erscheint unten rechts. Klick auf den Hintergrund beendet den Anruf.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIER SITUATIONEN -->
+  <section class="section fade" id="situationen">
+    <div class="wrap">
+      <h2 class="section-title">Vier Situationen, die Sie kennen</h2>
+      <div class="cases">
+
+        <article class="case">
+          <img
+            class="case-img"
+            src="https://images.unsplash.com/photo-1645445511761-01834d53205b?w=800&q=75&auto=format&fit=crop&crop=center"
+            alt="Mechaniker bei der Arbeit – Hände beschäftigt"
+            loading="lazy"
+          />
+          <div class="case-body">
+            <p class="case-problem">
+              Sie stehen mitten in der Arbeit, die Hände sind voll, und das Telefon klingelt.
+              Bis Sie es in der Hand haben, hat der Anrufer längst aufgelegt.
+            </p>
+            <div class="case-divider" aria-hidden="true">so läuft es stattdessen</div>
+            <p class="case-solution">
+              Der Assistent geht ran, während Sie weitermachen. Er nimmt das Anliegen auf
+              und notiert, wer angerufen hat und worum es ging.
+            </p>
+          </div>
+        </article>
+
+        <article class="case">
+          <img
+            class="case-img"
+            src="https://images.unsplash.com/photo-1511816120351-e2d275a814e3?w=800&q=75&auto=format&fit=crop&crop=center"
+            alt="Geschlossen-Schild – Betrieb nach Feierabend"
+            loading="lazy"
+          />
+          <div class="case-body">
+            <p class="case-problem">
+              Jemand ruft um zehn am Abend an oder am Sonntagvormittag. Im Büro ist niemand.
+              Die Nachricht auf dem Band hören Sie vielleicht erst am Montag.
+            </p>
+            <div class="case-divider" aria-hidden="true">so läuft es stattdessen</div>
+            <p class="case-solution">
+              Der Assistent ist auch dann erreichbar. Er beantwortet die Frage gleich
+              oder hält fest, dass ein Rückruf gewünscht ist.
+            </p>
+          </div>
+        </article>
+
+        <article class="case">
+          <img
+            class="case-img"
+            src="https://images.unsplash.com/photo-1525182008055-f88b95ff7980?w=800&q=75&auto=format&fit=crop&crop=center"
+            alt="Büromitarbeiter am Telefon – immer wieder dieselben Anrufe"
+            loading="lazy"
+          />
+          <div class="case-body">
+            <p class="case-problem">
+              Eine Kollegin hängt den halben Vormittag am Hörer. Immer wieder dieselben Fragen
+              nach Öffnungszeiten, Preisen und freien Terminen.
+            </p>
+            <div class="case-divider" aria-hidden="true">so läuft es stattdessen</div>
+            <p class="case-solution">
+              Die wiederkehrenden Anrufe laufen automatisch. Ihr Team kümmert sich um die Arbeit,
+              für die es eigentlich da ist. Es geht um Entlastung, nicht um Ersatz.
+            </p>
+          </div>
+        </article>
+
+        <article class="case">
+          <img
+            class="case-img"
+            src="https://images.unsplash.com/photo-1564396797585-82f726d7d39a?w=800&q=75&auto=format&fit=crop&crop=center"
+            alt="Kundin enttäuscht am Handy – Anruf kam nicht durch"
+            loading="lazy"
+          />
+          <div class="case-body">
+            <p class="case-problem">
+              Ein neuer Interessent ruft an, hört das Besetztzeichen und wählt die nächste
+              Nummer aus seiner Liste. Den Auftrag bekommt dann jemand anderes.
+            </p>
+            <div class="case-divider" aria-hidden="true">so läuft es stattdessen</div>
+            <p class="case-solution">
+              Jeder Anruf wird angenommen. Termine und Rückrufwünsche landen sofort dort,
+              wo Sie sie am nächsten Morgen wiederfinden.
+            </p>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- WAS DER ASSISTENT TUT -->
+  <section class="section section-quiet fade">
+    <div class="wrap narrow">
+      <h2 class="section-title">Was der Assistent für Sie übernimmt</h2>
+      <p class="lead">
+        Er nimmt Ihre Anrufe an, beantwortet die Fragen, die ohnehin jede Woche kommen,
+        und hält Termine sowie Rückrufwünsche fest. Das alles in Ihrem Namen, rund um die
+        Uhr und nach den Regeln der DSGVO.
+      </p>
+    </div>
+  </section>
+
+  <!-- VERTRAUEN -->
+  <section class="section fade">
+    <div class="wrap">
+      <h2 class="section-title">Worauf Sie sich verlassen können</h2>
+      <ul class="trust">
+        <li class="trust-item">
+          <span class="trust-head">Aus dem Allgäu</span>
+          <span class="trust-body">Sie haben einen festen Ansprechpartner, der persönlich erreichbar ist.</span>
+        </li>
+        <li class="trust-item">
+          <span class="trust-head">DSGVO-konform</span>
+          <span class="trust-body">Die Verarbeitung wird zu Beginn des Gesprächs angesagt. Gespeichert wird nur, was nötig ist.</span>
+        </li>
+        <li class="trust-item">
+          <span class="trust-head">Kostenlos und unverbindlich</span>
+          <span class="trust-body">Sie testen mit echten Anrufen aus Ihrem laufenden Betrieb. Kein Risiko, keine Verpflichtung.</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section section-quiet fade" id="faq">
+    <div class="wrap narrow">
+      <h2 class="section-title">Häufige Fragen</h2>
+      <div class="faq-list">
+
+        <details class="faq-item">
+          <summary class="faq-q">Ist das sicher — was passiert, wenn der Assistent ausfällt?</summary>
+          <p class="faq-a">
+            Der Assistent läuft auf redundanter Infrastruktur mit sehr hoher Verfügbarkeit.
+            Sollte es dennoch zu einem Ausfall kommen, klingelt Ihr Telefon einfach wie bisher —
+            der Anruf landet dann wieder bei Ihnen. Kein Anrufer hört ein Besetztzeichen oder
+            eine Fehlermeldung.
+          </p>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-q">Funktioniert das wirklich — oder klingt das nur im Demo gut?</summary>
+          <p class="faq-a">
+            Probieren Sie es oben selbst aus: Der Demo-Assistent läuft auf derselben Technik,
+            die auch im echten Betrieb eingesetzt wird. Im Testlauf bei Ihnen werden Anrufe
+            mit echten Kunden und echten Anfragen geführt — erst dann sehen wir beide, was
+            wirklich funktioniert. Deshalb ist der Test auch kostenlos.
+          </p>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-q">Ist das DSGVO-konform?</summary>
+          <p class="faq-a">
+            Ja. Zu Beginn jedes Gesprächs wird dem Anrufer mitgeteilt, dass ein digitaler
+            Assistent am Apparat ist und das Gespräch verarbeitet wird — das ist Pflicht und
+            wird eingehalten. Die Verarbeitung läuft über europäische Server. Vor dem Start
+            schließen wir einen Auftragsverarbeitungsvertrag ab, der Ihre Pflichten als
+            Verantwortlicher abdeckt.
+          </p>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-q">Muss ich etwas an meiner Telefonanlage ändern oder installieren?</summary>
+          <p class="faq-a">
+            Nein. Wir richten eine einfache Rufumleitung ein — entweder immer aktiv oder nur,
+            wenn Ihr Telefon besetzt ist oder nach einigen Sekunden niemand rangegangen ist.
+            Es braucht weder neue Hardware noch einen Techniker.
+          </p>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-q">Merken meine Kunden, dass kein Mensch dran ist?</summary>
+          <p class="faq-a">
+            Der Assistent klingt natürlich und flüssig, keine Roboter-Stimme. Zum Datenschutz
+            gibt es zu Beginn des Gesprächs einen kurzen Hinweis, dass ein digitaler Assistent
+            am Apparat ist — das ist gesetzlich vorgeschrieben und bei unseren Testanrufen
+            kein Gesprächsabbrecher.
+          </p>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-q">Was passiert, wenn der Assistent eine Frage nicht beantworten kann?</summary>
+          <p class="faq-a">
+            Er nimmt das Anliegen sauber auf und teilt dem Anrufer mit, dass sich jemand
+            aus dem Betrieb meldet. Nichts geht verloren — das Anliegen landet schriftlich bei Ihnen.
+          </p>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-q">Wie lange dauert der Testlauf, und was passiert danach?</summary>
+          <p class="faq-a">
+            Ein paar Wochen — so lange, bis wir beide sehen, was der Assistent im Alltag wirklich
+            leistet. Danach entscheiden Sie. Es gibt keine Verpflichtung und keinen automatischen
+            Übergang in ein kostenpflichtiges Modell.
+          </p>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-q">Für welche Betriebe eignet sich das?</summary>
+          <p class="faq-a">
+            Überall dort, wo täglich Anrufe eingehen, die das eigene Team vom Kerngeschäft
+            abhalten: Handwerk und Werkstätten, Hotels und Pensionen, Fahrschulen, Arztpraxen,
+            Verwaltungen, Dienstleister aller Art.
+          </p>
+        </details>
+
+        <details class="faq-item">
+          <summary class="faq-q">Wer hat Zugriff auf die Gesprächsdaten?</summary>
+          <p class="faq-a">
+            Nur Sie und ich. Die Verarbeitung läuft über europäische Server, es werden
+            keine Daten an Dritte weitergegeben. Die genauen Details besprechen wir vor
+            Beginn des Tests gemeinsam.
+          </p>
+        </details>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- WER -->
+  <section class="section fade">
+    <div class="wrap narrow">
+      <h2 class="section-title">Wer dahintersteht</h2>
+      <p class="lead">
+        Ich bin Simon Brändle und arbeite in der Nähe von Kempten im Allgäu. Mich interessiert,
+        was so ein Telefonassistent im echten Betrieb leistet — nicht in der Demo, sondern bei
+        ganz normalen Anrufen, wie sie bei Ihnen jeden Tag eingehen.
+      </p>
+      <p class="lead">
+        Dafür suche ich ein paar Betriebe, die das in Ruhe ausprobieren. Es kostet Sie nichts
+        und Sie gehen keine Verpflichtung ein.
+      </p>
+    </div>
+  </section>
+
+  <!-- KONTAKT -->
+  <section class="section section-contact fade" id="kontakt">
+    <div class="wrap narrow">
+      <h2 class="section-title">Reden wir kurz darüber</h2>
+      <p class="lead">
+        Wenn Sie neugierig geworden sind, lassen Sie uns telefonieren. Zehn Minuten reichen,
+        um zu klären, ob das für Ihren Betrieb passt. Schreiben Sie mir oder rufen Sie an,
+        ganz wie es Ihnen lieber ist.
+      </p>
+      <div class="contacts">
+        <a class="contact-link" href="tel:+4917544005977">+49 175 4400597</a>
+        <span class="contact-sep" aria-hidden="true"></span>
+        <a class="contact-link" href="mailto:simon.braendle16@gmail.com">simon.braendle16@gmail.com</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="call-overlay" id="callOverlay">
+  <button class="btn-hangup-overlay" id="hangupBtn" type="button">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
+    Auflegen
+  </button>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>Simon Brändle · Nähe Kempten, Allgäu</span>
+    <span>Keine Cookies · Keine Weitergabe personenbezogener Daten</span>
+  </div>
+</footer>
+
+<script>
+  // ── DEMO WIDGET: lazy-load nach Klick ──
+  var AGENT_ID = "agent_3701kvr7emgze60sx3qg2jekbgh1";
+
+  (function () {
+    var btn    = document.getElementById("startCall");
+    var demo   = document.getElementById("demo");
+    var loaded = false;
+
+    var overlay = document.getElementById("callOverlay");
+
+    function endCall() {
+      var w = document.getElementById("convaiWidget");
+      if (w) w.remove();
+      overlay.classList.remove("active");
+      document.getElementById("callActive").classList.remove("visible");
+      document.getElementById("demoHint").classList.remove("is-hidden");
+      btn.classList.remove("is-hidden");
+      loaded = false;
+    }
+    document.getElementById("hangupBtn").addEventListener("click", endCall);
+
+    btn.addEventListener("click", function () {
+      if (loaded) return;
+      loaded = true;
+
+      if (!AGENT_ID || AGENT_ID === "REPLACE_WITH_ELEVENLABS_AGENT_ID") {
+        var warn = document.createElement("p");
+        warn.className = "demo-hint";
+        warn.style.color = "#b94040";
+        warn.textContent = "Demo noch nicht verbunden — Agent-ID fehlt.";
+        demo.appendChild(warn);
+        loaded = false;
+        return;
+      }
+
+      btn.classList.add("is-hidden");
+      document.getElementById("demoHint").classList.add("is-hidden");
+      document.getElementById("callActive").classList.add("visible");
+
+      var s = document.createElement("script");
+      s.src  = "https://elevenlabs.io/convai-widget/index.js";
+      s.async = true;
+      s.type  = "text/javascript";
+      s.onload = function () {
+        var widget = document.createElement("elevenlabs-convai");
+        widget.setAttribute("agent-id", AGENT_ID);
+        widget.id = "convaiWidget";
+        document.body.appendChild(widget);
+        overlay.classList.add("active");
+
+        setTimeout(function () {
+          widget.click();
+          if (widget.shadowRoot) {
+            var inner = widget.shadowRoot.querySelector("button, [role='button']");
+            if (inner) inner.click();
+          }
+        }, 700);
+      };
+      document.body.appendChild(s);
+    });
+  })();
+
+  // ── SCROLL FADE-IN ──
+  (function () {
+    if (!("IntersectionObserver" in window)) {
+      document.querySelectorAll(".fade").forEach(function (el) {
+        el.classList.add("visible");
+      });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add("visible");
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll(".fade").forEach(function (el) { io.observe(el); });
+  })();
+</script>
+
+</body>
+</html>
