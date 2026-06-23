@@ -1,0 +1,20 @@
+{
+  "name": "ki-telefon",
+  "version": "1.0.0",
+  "description": "Telefonassistent für Ihren Betrieb",
+  "type": "module",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'No build needed for static HTML'"
+  },
+  "keywords": [
+    "telefonassistent",
+    "ai",
+    "telefon"
+  ],
+  "author": "Simon Brändle",
+  "license": "MIT",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
