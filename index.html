@@ -468,8 +468,9 @@
     <a href="#" class="nav-logo">KI-Telefonassistent</a>
     <nav aria-label="Seitennavigation">
       <ul class="nav-links">
-        <li><a href="#demo">Demo</a></li>
         <li><a href="#situationen">Wie es hilft</a></li>
+        <li><a href="was-er-kann.html">Was er kann</a></li>
+        <li><a href="was-er-kann.html#demo">Demo</a></li>
         <li><a href="#faq">FAQ</a></li>
         <li><a href="#kontakt">Kontakt</a></li>
       </ul>
@@ -484,24 +485,18 @@
     <div class="wrap hero-inner">
       <span class="eyebrow">Für lokale Betriebe im Allgäu</span>
       <h1>Geht bei Ihnen manchmal ein Anruf unter?</h1>
-      <p class="hero-sub">So könnte es bei Ihnen am Telefon klingen.</p>
+      <p class="hero-sub">
+        Hören Sie an einem Musterbetrieb, wie es bei Ihnen am Telefon klingen würde.
+      </p>
 
-      <div class="demo-stage" id="demo">
-        <button class="btn-call" id="startCall" type="button" aria-describedby="demoHint">
+      <div class="demo-stage">
+        <a class="btn-call" href="was-er-kann.html#demo">
           <span class="btn-dot" aria-hidden="true"></span>
-          Anruf starten
-        </button>
-        <p class="demo-hint" id="demoHint">
-          Dauert einen Moment. Sprechen Sie einfach so, wie Sie mit einem Mitarbeiter reden würden.
+          Live anhören
+        </a>
+        <p class="demo-hint">
+          Ein Klick führt zur Demo — dort rufen Sie den Assistenten an und hören selbst.
         </p>
-
-        <div class="call-active" id="callActive" aria-live="polite">
-          <div class="call-status">
-            <span class="call-status-dot" aria-hidden="true"></span>
-            Gespräch läuft
-          </div>
-          <p class="call-note">Das Gesprächsfenster erscheint unten rechts. Klick auf den Hintergrund beendet den Anruf.</p>
-        </div>
       </div>
     </div>
   </section>
@@ -598,13 +593,35 @@
 
   <!-- WAS DER ASSISTENT TUT -->
   <section class="section section-quiet fade">
-    <div class="wrap narrow">
+    <div class="wrap">
       <h2 class="section-title">Was der Assistent für Sie übernimmt</h2>
-      <p class="lead">
-        Er nimmt Ihre Anrufe an, beantwortet die Fragen, die ohnehin jede Woche kommen,
-        und hält Termine sowie Rückrufwünsche fest. Das alles in Ihrem Namen, rund um die
-        Uhr und nach den Regeln der DSGVO.
+      <p class="lead" style="max-width:700px;">
+        Er springt ein, wenn bei Ihnen gerade niemand ans Telefon kann — nimmt den Anruf an,
+        beantwortet die Fragen, die ohnehin jede Woche kommen, und hält Termine sowie
+        Rückrufwünsche fest. In Ihrem Namen, rund um die Uhr und nach den Regeln der DSGVO.
+        Offen als Assistent erkennbar, mit Übergabe an einen Menschen, wenn es nötig ist.
       </p>
+      <ul class="trust" style="margin-top:2.5rem;">
+        <li class="trust-item">
+          <span class="trust-head">Kein verpasster Anruf</span>
+          <span class="trust-body">Kein verlorener Kunde, weil das Telefon im Stress durchgeklingelt hat.</span>
+        </li>
+        <li class="trust-item">
+          <span class="trust-head">Weniger Stress</span>
+          <span class="trust-body">Das Telefon klingelt nicht mehr ständig dazwischen — Ihr Team kommt zur Ruhe.</span>
+        </li>
+        <li class="trust-item">
+          <span class="trust-head">Immer erreichbar</span>
+          <span class="trust-body">Auch nach Feierabend und bei Andrang nimmt jemand ab.</span>
+        </li>
+        <li class="trust-item">
+          <span class="trust-head">Mehr Zeit fürs Kerngeschäft</span>
+          <span class="trust-body">Sie kümmern sich um den Kunden vor Ort, nicht ums Klingeln.</span>
+        </li>
+      </ul>
+      <div class="contacts" style="margin-top:2.25rem;">
+        <a class="contact-link" href="was-er-kann.html">Alles, was er übernimmt &rarr;</a>
+      </div>
     </div>
   </section>
 
@@ -759,13 +776,6 @@
 
 </main>
 
-<div class="call-overlay" id="callOverlay">
-  <button class="btn-hangup-overlay" id="hangupBtn" type="button">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
-    Auflegen
-  </button>
-</div>
-
 <footer class="site-footer">
   <div class="wrap footer-inner">
     <span>Simon Brändle · Nähe Kempten, Allgäu</span>
@@ -774,68 +784,6 @@
 </footer>
 
 <script>
-  // ── DEMO WIDGET: lazy-load nach Klick ──
-  var AGENT_ID = "agent_9401kvtc9atffwpsy4n1yqp3nbe0";
-
-  (function () {
-    var btn    = document.getElementById("startCall");
-    var demo   = document.getElementById("demo");
-    var loaded = false;
-
-    var overlay = document.getElementById("callOverlay");
-
-    function endCall() {
-      var w = document.getElementById("convaiWidget");
-      if (w) w.remove();
-      overlay.classList.remove("active");
-      document.getElementById("callActive").classList.remove("visible");
-      document.getElementById("demoHint").classList.remove("is-hidden");
-      btn.classList.remove("is-hidden");
-      loaded = false;
-    }
-    document.getElementById("hangupBtn").addEventListener("click", endCall);
-
-    btn.addEventListener("click", function () {
-      if (loaded) return;
-      loaded = true;
-
-      if (!AGENT_ID || AGENT_ID === "REPLACE_WITH_ELEVENLABS_AGENT_ID") {
-        var warn = document.createElement("p");
-        warn.className = "demo-hint";
-        warn.style.color = "#b94040";
-        warn.textContent = "Demo noch nicht verbunden — Agent-ID fehlt.";
-        demo.appendChild(warn);
-        loaded = false;
-        return;
-      }
-
-      btn.classList.add("is-hidden");
-      document.getElementById("demoHint").classList.add("is-hidden");
-      document.getElementById("callActive").classList.add("visible");
-
-      var s = document.createElement("script");
-      s.src  = "https://elevenlabs.io/convai-widget/index.js";
-      s.async = true;
-      s.type  = "text/javascript";
-      s.onload = function () {
-        var widget = document.createElement("elevenlabs-convai");
-        widget.setAttribute("agent-id", AGENT_ID);
-        widget.id = "convaiWidget";
-        document.body.appendChild(widget);
-        overlay.classList.add("active");
-
-        setTimeout(function () {
-          widget.click();
-          if (widget.shadowRoot) {
-            var inner = widget.shadowRoot.querySelector("button, [role='button']");
-            if (inner) inner.click();
-          }
-        }, 700);
-      };
-      document.body.appendChild(s);
-    });
-  })();
-
   // ── SCROLL FADE-IN ──
   (function () {
     if (!("IntersectionObserver" in window)) {

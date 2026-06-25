@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Was der Telefonassistent kann · Simon Brändle, Allgäu</title>
+  <meta name="description" content="Konkret und kurz: Was der Telefonassistent übernimmt — Anrufe annehmen, Fragen beantworten, Termine und Rückrufe festhalten, an einen Menschen übergeben. Live anhören am Musterbetrieb Heimstein Hausverwaltung." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── TOKENS ── */
+    :root {
+      --paper:       #f4f2ec;
+      --surface:     #fdfbf7;
+      --ink:         #1c2022;
+      --muted:       #58636b;
+      --accent:      #1e6b52;
+      --accent-soft: #cce8dd;
+      --line:        #e1dace;
+      --max:         1080px;
+      --r:           12px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { background: var(--paper); scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 1.0625rem;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3 {
+      font-family: "Newsreader", Georgia, serif;
+      font-weight: 500;
+      letter-spacing: -0.015em;
+      color: var(--ink);
+      text-wrap: balance;
+    }
+
+    /* ── LAYOUT ── */
+    .wrap {
+      width: 100%;
+      max-width: var(--max);
+      margin-inline: auto;
+      padding-inline: 1.5rem;
+    }
+    .narrow { max-width: 700px; }
+
+    /* ── HEADER / NAV ── */
+    .site-header {
+      border-bottom: 1px solid var(--line);
+      background: var(--paper);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-block: .9rem;
+      gap: 1rem;
+    }
+    .nav-logo {
+      font-family: "Newsreader", Georgia, serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: .25rem;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+    .nav-links a {
+      font-size: .88rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      padding: .35rem .7rem;
+      border-radius: 6px;
+      transition: background .15s ease, color .15s ease;
+    }
+    .nav-links a:hover {
+      background: var(--line);
+      color: var(--ink);
+    }
+    .nav-links a.current { color: var(--ink); background: var(--line); }
+
+    /* ── HERO ── */
+    .hero {
+      padding-top: 5rem;
+      padding-bottom: 4.5rem;
+      text-align: center;
+    }
+    .hero-inner {
+      max-width: 620px;
+      margin-inline: auto;
+    }
+    .eyebrow {
+      display: inline-block;
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.1rem);
+      line-height: 1.15;
+      margin-bottom: 1.1rem;
+    }
+    .hero-sub {
+      font-size: 1.15rem;
+      color: var(--muted);
+      margin-bottom: 2.75rem;
+    }
+
+    /* ── DEMO BUTTON ── */
+    .demo-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+    }
+    .btn-call {
+      display: inline-flex;
+      align-items: center;
+      gap: .65rem;
+      background: var(--accent);
+      color: #fdfdfb;
+      border: none;
+      border-radius: 999px;
+      padding: 1rem 2.25rem;
+      font-family: inherit;
+      font-size: 1.0625rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .18s ease, transform .12s ease;
+    }
+    .btn-call:hover  { background: #185c45; }
+    .btn-call:active { transform: translateY(1px); }
+    .btn-call:focus-visible {
+      outline: 3px solid rgba(30,107,82,.35);
+      outline-offset: 4px;
+    }
+    .btn-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      flex-shrink: 0;
+    }
+    a.btn-call { text-decoration: none; }
+    .is-hidden { display: none !important; }
+    .demo-hint {
+      max-width: 440px;
+      color: var(--muted);
+      font-size: .93rem;
+      line-height: 1.5;
+    }
+
+    /* ── CALL OVERLAY ── */
+    .call-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .55);
+      z-index: 998;
+      backdrop-filter: blur(2px);
+    }
+    .call-overlay.active { display: flex; align-items: flex-end; justify-content: center; padding-bottom: 2rem; }
+    .btn-hangup-overlay {
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      background: #c0392b;
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: .85rem 2rem;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      z-index: 999;
+      transition: background .15s ease;
+      box-shadow: 0 4px 20px rgba(0,0,0,.35);
+    }
+    .btn-hangup-overlay:hover { background: #a93226; }
+
+    /* ── AKTIVER ANRUF ── */
+    .call-active {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.1rem;
+    }
+    .call-active.visible { display: flex; }
+    .call-status {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .call-status-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: blink 1.4s ease-in-out infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .3; }
+    }
+    .call-note {
+      font-size: .9rem;
+      color: var(--muted);
+    }
+
+    /* ── SECTIONS ── */
+    .section {
+      padding-block: 4.5rem;
+      border-top: 1px solid var(--line);
+    }
+    .section-quiet   { background: var(--surface); }
+    .section-contact { padding-bottom: 5.5rem; }
+
+    .section-title {
+      font-size: clamp(1.5rem, 3vw, 1.9rem);
+      margin-bottom: 2.25rem;
+    }
+    .narrow .section-title { margin-bottom: 1.4rem; }
+
+    .lead {
+      font-size: 1.1rem;
+      color: var(--ink);
+      margin-bottom: 1.1rem;
+    }
+    .lead:last-child { margin-bottom: 0; }
+
+    /* ── TRUST / FÄHIGKEITEN ── */
+    .trust {
+      list-style: none;
+      display: grid;
+      gap: 1.4rem;
+      grid-template-columns: 1fr;
+    }
+    .trust-item {
+      display: flex;
+      flex-direction: column;
+      gap: .35rem;
+      padding-left: 1.1rem;
+      border-left: 2px solid var(--accent);
+    }
+    .trust-head { font-weight: 600; font-size: 1.05rem; }
+    .trust-body { color: var(--muted); }
+
+    /* ── CONTACT ── */
+    .contacts {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1.75rem;
+    }
+    .contact-link {
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 1.05rem;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color .15s ease;
+    }
+    .contact-link:hover { border-color: var(--accent); }
+    .contact-alt {
+      margin-top: 1.1rem;
+      color: var(--muted);
+      font-size: .98rem;
+    }
+
+    /* ── FOOTER ── */
+    .site-footer {
+      border-top: 1px solid var(--line);
+      background: var(--paper);
+    }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: .5rem;
+      padding-block: 1.5rem;
+      font-size: .88rem;
+      color: var(--muted);
+    }
+
+    /* ── SCROLL FADE-IN ── */
+    .fade {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity .55s ease, transform .55s ease;
+    }
+    .fade.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (min-width: 680px) {
+      .trust { grid-template-columns: repeat(2, 1fr); gap: 1.8rem 2rem; }
+      .trust-item {
+        border-left: none;
+        border-top: 2px solid var(--accent);
+        padding-left: 0;
+        padding-top: 1rem;
+      }
+    }
+    @media (min-width: 900px) {
+      .section { padding-block: 5.5rem; }
+    }
+    @media (max-width: 520px) {
+      .nav-links { gap: 0; }
+      .nav-links a { padding: .3rem .5rem; font-size: .82rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .btn-call { transition: none; }
+      .fade { opacity: 1; transform: none; transition: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<header class="site-header">
+  <div class="wrap nav-inner">
+    <a href="index.html" class="nav-logo">KI-Telefonassistent</a>
+    <nav aria-label="Seitennavigation">
+      <ul class="nav-links">
+        <li><a href="index.html#situationen">Wie es hilft</a></li>
+        <li><a href="was-er-kann.html" class="current" aria-current="page">Was er kann</a></li>
+        <li><a href="#demo">Demo</a></li>
+        <li><a href="index.html#faq">FAQ</a></li>
+        <li><a href="index.html#kontakt">Kontakt</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO + DEMO -->
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <span class="eyebrow">Hören Sie selbst</span>
+      <h1>So könnte es bald in Ihrem Betrieb klingen</h1>
+      <p class="hero-sub">
+        Rufen Sie den Assistenten eines Musterbetriebs an — und hören Sie direkt, wie es klingt.
+      </p>
+
+      <div class="demo-stage" id="demo">
+        <button class="btn-call" id="startCall" type="button" aria-describedby="demoHint">
+          <span class="btn-dot" aria-hidden="true"></span>
+          Anruf starten
+        </button>
+        <p class="demo-hint" id="demoHint">
+          Sie rufen den Assistenten eines Musterbetriebs an. Sprechen Sie einfach so, wie Sie mit
+          einem Mitarbeiter reden würden.
+        </p>
+
+        <div class="call-active" id="callActive" aria-live="polite">
+          <div class="call-status">
+            <span class="call-status-dot" aria-hidden="true"></span>
+            Gespräch läuft
+          </div>
+          <p class="call-note">Das Gesprächsfenster erscheint unten rechts. Klick auf den Hintergrund beendet den Anruf.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FÄHIGKEITEN -->
+  <section class="section fade">
+    <div class="wrap">
+      <h2 class="section-title">Das übernimmt er im Alltag</h2>
+      <ul class="trust">
+        <li class="trust-item">
+          <span class="trust-head">Nimmt jeden Anruf an</span>
+          <span class="trust-body">Auch wenn gerade alle eingespannt sind, außerhalb der Öffnungszeiten oder wenn mehrere gleichzeitig anrufen.</span>
+        </li>
+        <li class="trust-item">
+          <span class="trust-head">Beantwortet die immer gleichen Fragen</span>
+          <span class="trust-body">Öffnungszeiten, Anfahrt, Leistungen — alles, was Sie hinterlegen, gibt er zuverlässig weiter.</span>
+        </li>
+        <li class="trust-item">
+          <span class="trust-head">Hält Termine fest</span>
+          <span class="trust-body">Nimmt Wunschtermine auf oder bucht direkt nach Ihren Regeln.</span>
+        </li>
+        <li class="trust-item">
+          <span class="trust-head">Nimmt Rückrufwünsche auf</span>
+          <span class="trust-body">Name, Anliegen, Nummer, beste Zeit — strukturiert, damit nichts verloren geht.</span>
+        </li>
+        <li class="trust-item">
+          <span class="trust-head">Kurze Notiz nach jedem Anruf</span>
+          <span class="trust-body">Sie sehen auf einen Blick, wer was wollte, ohne irgendwo nachzufragen.</span>
+        </li>
+        <li class="trust-item">
+          <span class="trust-head">Übergibt an einen Menschen</span>
+          <span class="trust-body">Bei komplexen oder heiklen Anliegen leitet er weiter oder kündigt Ihren Rückruf an.</span>
+        </li>
+        <li class="trust-item">
+          <span class="trust-head">Sagt offen, dass er ein Assistent ist</span>
+          <span class="trust-body">Keine Täuschung. Zu Beginn die DSGVO-Ansage, dann geht es los.</span>
+        </li>
+        <li class="trust-item">
+          <span class="trust-head">Monatlicher Kurzüberblick</span>
+          <span class="trust-body">Was reinkam und was er aufgefangen hat — damit Sie den Nutzen schwarz auf weiß sehen.</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- MUSTERBETRIEB -->
+  <section class="section section-quiet fade">
+    <div class="wrap">
+      <h2 class="section-title">Das Beispiel: Heimstein Hausverwaltung</h2>
+      <p class="lead" style="max-width:720px;">
+        Damit Sie nicht nur darüber lesen, habe ich einen Musterbetrieb aufgesetzt — die
+        <strong>Heimstein Hausverwaltung</strong>, eine fiktive Beispiel-Hausverwaltung in Kempten.
+        Ihre digitale Assistentin heißt <strong>Lisa</strong>. So hören Sie, wie der Assistent in
+        einem ganz normalen Arbeitsalltag klingt, ohne dass schon echte Daten im Spiel sind.
+      </p>
+      <p class="lead" style="max-width:720px;">
+        Lisa nimmt jeden Anruf an, ordnet das Anliegen ein und erfasst dabei Name, Adresse,
+        Rückrufnummer und wie dringend es ist. Vier Bereiche deckt sie ab:
+      </p>
+      <ul class="trust" style="margin-top:2.25rem;">
+        <li class="trust-item">
+          <span class="trust-head">Allgemeine Fragen</span>
+          <span class="trust-body">Öffnungszeiten, Ansprechpartner, Kündigung, Haustiere, Mieterportal — beantwortet sie direkt.</span>
+        </li>
+        <li class="trust-item">
+          <span class="trust-head">Abrechnung</span>
+          <span class="trust-body">Miete, Nebenkosten, Kaution: Standardfragen beantwortet sie sofort, alles Weitere geht an die Buchhaltung.</span>
+        </li>
+        <li class="trust-item">
+          <span class="trust-head">Technische Probleme</span>
+          <span class="trust-body">Reparaturen und Defekte: sie nimmt alle Details auf — Problem, seit wann, Dringlichkeit — und gibt sie ans Technik-Team.</span>
+        </li>
+        <li class="trust-item">
+          <span class="trust-head">Notfälle</span>
+          <span class="trust-body">Wasserrohrbruch, Gasgeruch, Aufzug: sie bleibt ruhig, nennt Sofortmaßnahmen und die 24-Stunden-Hotline.</span>
+        </li>
+      </ul>
+      <p class="lead" style="max-width:720px; margin-top:1.6rem;">
+        Und sie legt nie von sich aus auf — am Ende fragt sie immer, ob sie sonst noch etwas
+        tun kann.
+      </p>
+      <div class="contacts">
+        <a class="contact-link" href="#demo">Lisa jetzt anrufen &uarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section section-contact fade">
+    <div class="wrap narrow">
+      <h2 class="section-title">Am besten hören Sie selbst</h2>
+      <p class="lead">
+        Beschreiben lässt sich viel — überzeugend ist es erst, wenn Sie ihn sprechen hören.
+        Ein Klick, und Sie sind im Gespräch.
+      </p>
+      <div class="contacts">
+        <a class="btn-call" href="#demo">
+          <span class="btn-dot" aria-hidden="true"></span>
+          Zur Demo
+        </a>
+      </div>
+      <p class="contact-alt">
+        Lieber zuerst reden? Schreiben Sie mir zwei Zeilen an
+        <a class="contact-link" href="mailto:simon.braendle16@gmail.com?subject=R%C3%BCckruf-Anfrage%20%E2%80%94%20KI-Telefonassistent">simon.braendle16@gmail.com</a>
+        — ich rufe Sie zurück.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<div class="call-overlay" id="callOverlay">
+  <button class="btn-hangup-overlay" id="hangupBtn" type="button">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
+    Auflegen
+  </button>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <span>Simon Brändle · Nähe Kempten, Allgäu</span>
+    <span>Keine Cookies · Keine Weitergabe personenbezogener Daten</span>
+  </div>
+</footer>
+
+<script>
+  // ── DEMO WIDGET: lazy-load nach Klick ──
+  var AGENT_ID = "agent_9401kvtc9atffwpsy4n1yqp3nbe0";
+
+  (function () {
+    var btn    = document.getElementById("startCall");
+    var demo   = document.getElementById("demo");
+    var loaded = false;
+
+    var overlay = document.getElementById("callOverlay");
+
+    function endCall() {
+      var w = document.getElementById("convaiWidget");
+      if (w) w.remove();
+      overlay.classList.remove("active");
+      document.getElementById("callActive").classList.remove("visible");
+      document.getElementById("demoHint").classList.remove("is-hidden");
+      btn.classList.remove("is-hidden");
+      loaded = false;
+    }
+    document.getElementById("hangupBtn").addEventListener("click", endCall);
+
+    btn.addEventListener("click", function () {
+      if (loaded) return;
+      loaded = true;
+
+      if (!AGENT_ID || AGENT_ID === "REPLACE_WITH_ELEVENLABS_AGENT_ID") {
+        var warn = document.createElement("p");
+        warn.className = "demo-hint";
+        warn.style.color = "#b94040";
+        warn.textContent = "Demo noch nicht verbunden — Agent-ID fehlt.";
+        demo.appendChild(warn);
+        loaded = false;
+        return;
+      }
+
+      btn.classList.add("is-hidden");
+      document.getElementById("demoHint").classList.add("is-hidden");
+      document.getElementById("callActive").classList.add("visible");
+
+      var s = document.createElement("script");
+      s.src  = "https://elevenlabs.io/convai-widget/index.js";
+      s.async = true;
+      s.type  = "text/javascript";
+      s.onload = function () {
+        var widget = document.createElement("elevenlabs-convai");
+        widget.setAttribute("agent-id", AGENT_ID);
+        widget.id = "convaiWidget";
+        document.body.appendChild(widget);
+        overlay.classList.add("active");
+
+        setTimeout(function () {
+          widget.click();
+          if (widget.shadowRoot) {
+            var inner = widget.shadowRoot.querySelector("button, [role='button']");
+            if (inner) inner.click();
+          }
+        }, 700);
+      };
+      document.body.appendChild(s);
+    });
+  })();
+
+  // ── SCROLL FADE-IN ──
+  (function () {
+    if (!("IntersectionObserver" in window)) {
+      document.querySelectorAll(".fade").forEach(function (el) {
+        el.classList.add("visible");
+      });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add("visible");
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll(".fade").forEach(function (el) { io.observe(el); });
+  })();
+</script>
+
+</body>
+</html>
