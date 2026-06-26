@@ -384,9 +384,11 @@
             <span class="call-status-dot" aria-hidden="true"></span>
             Gespräch läuft
           </div>
-          <p class="call-note">Das Gesprächsfenster erscheint unten rechts. Klick auf den Hintergrund beendet den Anruf.</p>
+          <p class="call-note">Sprechen Sie ganz normal — wie mit einem Mitarbeiter. Über »Auflegen« beenden Sie das Gespräch.</p>
         </div>
       </div>
+
+      <div id="digestPanel" style="display:none;"></div>
     </div>
   </section>
 
@@ -412,8 +414,8 @@
           <span class="trust-body">Name, Anliegen, Nummer, beste Zeit — strukturiert, damit nichts verloren geht.</span>
         </li>
         <li class="trust-item">
-          <span class="trust-head">Kurze Notiz nach jedem Anruf</span>
-          <span class="trust-body">Sie sehen auf einen Blick, wer was wollte, ohne irgendwo nachzufragen.</span>
+          <span class="trust-head">Zusammenfassung nach jedem Anruf</span>
+          <span class="trust-body">Sie sehen auf einen Blick, worum es ging, wie der Assistent reagiert hat und was daraus wurde. Passt Ihnen etwas nicht, sagen Sie es — und ich stelle ihn nach. Volle Sicht, ohne nachzufragen.</span>
         </li>
         <li class="trust-item">
           <span class="trust-head">Übergibt an einen Menschen</span>
@@ -473,6 +475,48 @@
     </div>
   </section>
 
+  <!-- BEISPIEL-DIGEST (Stufe 1, statisch) -->
+  <section class="section fade">
+    <div class="wrap narrow">
+      <h2 class="section-title">Was Sie nach jedem Anruf bekommen</h2>
+      <p class="lead" style="max-width:720px;">
+        Sie geben das Telefon ab und behalten trotzdem die volle Sicht: Nach jedem Anruf
+        erhalten Sie eine kurze, klare Zusammenfassung — worum es ging, wie der Assistent
+        reagiert hat und was daraus wurde. So sieht das bei Lisa aus:
+      </p>
+
+      <div style="background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:1.5rem 1.6rem; max-width:720px; margin-top:1.75rem; box-shadow:0 1px 2px rgba(0,0,0,.03);">
+        <div style="display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:.9rem; margin-bottom:1.2rem;">
+          <span style="font-size:.72rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--accent); background:var(--accent-soft); padding:.2rem .55rem; border-radius:6px;">Beispiel</span>
+          <span style="font-weight:600; color:var(--ink);">Zusammenfassung &middot; Anruf 09:14 Uhr &middot; 1:48&nbsp;Min.</span>
+        </div>
+
+        <dl style="margin:0; display:flex; flex-direction:column; gap:1.05rem;">
+          <div>
+            <dt style="font-size:.74rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); margin-bottom:.25rem;">Anlass</dt>
+            <dd style="margin:0; color:var(--ink);">Frau Berger, Mieterin in der Lindauer Str. 12, meldet einen Heizungsausfall — seit gestern Abend bleibt die Wohnung kalt.</dd>
+          </div>
+          <div>
+            <dt style="font-size:.74rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); margin-bottom:.25rem;">Wie der Assistent reagiert hat</dt>
+            <dd style="margin:0; color:var(--ink);">Lisa hat Name, Adresse, Rückrufnummer und Dringlichkeit aufgenommen, das Anliegen als technischen Defekt eingeordnet und angekündigt, dass sich das Technik-Team meldet. Zur Frage, wer die Kosten trägt, hat sie nichts zugesagt, sondern an die Hausverwaltung verwiesen.</dd>
+          </div>
+          <div>
+            <dt style="font-size:.74rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); margin-bottom:.25rem;">Ergebnis</dt>
+            <dd style="margin:0; color:var(--ink);">Vorgang an das Technik-Team übergeben, Rückruf an Frau Berger angekündigt. Keine verbindliche Zusage gemacht.</dd>
+          </div>
+          <div>
+            <dt style="font-size:.74rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); margin-bottom:.25rem;">Aufgefallen</dt>
+            <dd style="margin:0; color:var(--ink);">Die Mieterin war über die Kälte spürbar verärgert — ein kurzer persönlicher Rückruf wäre hier sinnvoll.</dd>
+          </div>
+        </dl>
+
+        <p style="margin:1.3rem 0 0; padding-top:1rem; border-top:1px solid var(--line); font-size:.92rem; color:var(--muted);">
+          Passt Ihnen etwas nicht? Ein kurzer Hinweis genügt — dann justiere ich den Assistenten nach. Sie müssen nichts mitlesen, Sie können jederzeit.
+        </p>
+      </div>
+    </div>
+  </section>
+
   <!-- CTA -->
   <section class="section section-contact fade">
     <div class="wrap narrow">
@@ -512,66 +556,158 @@
 </footer>
 
 <script>
-  // ── DEMO WIDGET: lazy-load nach Klick ──
+  // ── DEMO-ANRUF via @elevenlabs/client SDK + Live-Zusammenfassung ──
   var AGENT_ID = "agent_9401kvtc9atffwpsy4n1yqp3nbe0";
 
   (function () {
-    var btn    = document.getElementById("startCall");
-    var demo   = document.getElementById("demo");
-    var loaded = false;
+    var btn      = document.getElementById("startCall");
+    var demoHint = document.getElementById("demoHint");
+    var callAct  = document.getElementById("callActive");
+    var overlay  = document.getElementById("callOverlay");
+    var hangup   = document.getElementById("hangupBtn");
+    var panel    = document.getElementById("digestPanel");
 
-    var overlay = document.getElementById("callOverlay");
+    var conversation = null;
+    var transcript = [];
+    var busy = false;
+    var sdkPromise = null;
+
+    function loadSdk() {
+      if (!sdkPromise) {
+        sdkPromise = import("https://esm.sh/@elevenlabs/client")
+          .then(function (m) { return m.Conversation; });
+      }
+      return sdkPromise;
+    }
+
+    function setCallUI(active) {
+      btn.classList.toggle("is-hidden", active);
+      demoHint.classList.toggle("is-hidden", active);
+      callAct.classList.toggle("visible", active);
+      overlay.classList.toggle("active", active);
+    }
+
+    function esc(s) {
+      return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+      });
+    }
+
+    function shell(inner) {
+      return '<div style="background:var(--surface);border:1px solid var(--line);' +
+        'border-radius:14px;padding:1.5rem 1.6rem;max-width:720px;margin:1.9rem auto 0;' +
+        'box-shadow:0 1px 2px rgba(0,0,0,.03);text-align:left;">' + inner + '</div>';
+    }
+
+    function field(label, value) {
+      return '<div><dt style="font-size:.74rem;font-weight:700;letter-spacing:.04em;' +
+        'text-transform:uppercase;color:var(--muted);margin-bottom:.25rem;">' + label +
+        '</dt><dd style="margin:0;color:var(--ink);">' + esc(value) + '</dd></div>';
+    }
+
+    function header() {
+      return '<div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;' +
+        'border-bottom:1px solid var(--line);padding-bottom:.9rem;margin-bottom:1.2rem;">' +
+        '<span style="font-size:.72rem;font-weight:700;letter-spacing:.05em;' +
+        'text-transform:uppercase;color:var(--accent);background:var(--accent-soft);' +
+        'padding:.2rem .55rem;border-radius:6px;">Ihr Anruf</span>' +
+        '<span style="font-weight:600;color:var(--ink);">Zusammenfassung &middot; gerade eben</span></div>';
+    }
+
+    function showLoading() {
+      panel.innerHTML = shell('<p style="margin:0;color:var(--muted);">Ihre Zusammenfassung wird erstellt &hellip;</p>');
+      panel.style.display = "block";
+      panel.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function showError() {
+      panel.innerHTML = shell('<p style="margin:0;color:var(--muted);">Die Zusammenfassung ' +
+        'konnte gerade nicht erstellt werden. Im echten Betrieb erhalten Sie sie nach jedem ' +
+        'Anruf automatisch.</p>');
+    }
+
+    function showDigest(d) {
+      var auf = (d.auffaelligkeit && d.auffaelligkeit !== "-") ? d.auffaelligkeit : "Nichts Besonderes.";
+      var dl = '<dl style="margin:0;display:flex;flex-direction:column;gap:1.05rem;">' +
+        field("Anlass", d.anlass) +
+        field("Wie der Assistent reagiert hat", d.reaktion) +
+        field("Ergebnis", d.ergebnis) +
+        field("Aufgefallen", auf) + '</dl>';
+      var foot = '<p style="margin:1.3rem 0 0;padding-top:1rem;border-top:1px solid var(--line);' +
+        'font-size:.92rem;color:var(--muted);">Genau so bekommen Sie im echten Betrieb jeden ' +
+        'Anruf aufbereitet &mdash; Sie müssen nichts mitlesen, können aber jederzeit.</p>';
+      panel.innerHTML = shell(header() + dl + foot);
+    }
+
+    function buildDigest() {
+      var text = transcript.map(function (t) { return t.who + ": " + t.text; }).join("\n");
+      showLoading();
+      fetch("/api/digest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transcript: text })
+      }).then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+      }).then(function (d) {
+        if (!d || d.error) throw new Error(d && d.error ? d.error : "leer");
+        showDigest(d);
+      }).catch(function (e) {
+        console.error("Digest-Fehler:", e);
+        showError();
+      });
+    }
 
     function endCall() {
-      var w = document.getElementById("convaiWidget");
-      if (w) w.remove();
-      overlay.classList.remove("active");
-      document.getElementById("callActive").classList.remove("visible");
-      document.getElementById("demoHint").classList.remove("is-hidden");
-      btn.classList.remove("is-hidden");
-      loaded = false;
-    }
-    document.getElementById("hangupBtn").addEventListener("click", endCall);
-
-    btn.addEventListener("click", function () {
-      if (loaded) return;
-      loaded = true;
-
-      if (!AGENT_ID || AGENT_ID === "REPLACE_WITH_ELEVENLABS_AGENT_ID") {
-        var warn = document.createElement("p");
-        warn.className = "demo-hint";
-        warn.style.color = "#b94040";
-        warn.textContent = "Demo noch nicht verbunden — Agent-ID fehlt.";
-        demo.appendChild(warn);
-        loaded = false;
-        return;
+      var hadCall = !!conversation;
+      if (conversation) {
+        try { conversation.endSession(); } catch (e) {}
+        conversation = null;
       }
+      setCallUI(false);
+      busy = false;
+      if (hadCall && transcript.length >= 2) buildDigest();
+    }
 
-      btn.classList.add("is-hidden");
-      document.getElementById("demoHint").classList.add("is-hidden");
-      document.getElementById("callActive").classList.add("visible");
+    function startCall() {
+      if (busy) return;
+      busy = true;
+      transcript = [];
+      panel.style.display = "none";
+      panel.innerHTML = "";
 
-      var s = document.createElement("script");
-      s.src  = "https://elevenlabs.io/convai-widget/index.js";
-      s.async = true;
-      s.type  = "text/javascript";
-      s.onload = function () {
-        var widget = document.createElement("elevenlabs-convai");
-        widget.setAttribute("agent-id", AGENT_ID);
-        widget.id = "convaiWidget";
-        document.body.appendChild(widget);
-        overlay.classList.add("active");
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(function () {
+        return loadSdk();
+      }).then(function (Conversation) {
+        return Conversation.startSession({
+          agentId: AGENT_ID,
+          onConnect: function () { setCallUI(true); },
+          onMessage: function (msg) {
+            if (!msg) return;
+            var text = (msg.message != null) ? msg.message : (msg.text != null ? msg.text : "");
+            text = String(text).trim();
+            if (!text) return;
+            var source = msg.source || msg.role || "";
+            var who = (source === "user") ? "Anrufer" : "Assistent";
+            var last = transcript[transcript.length - 1];
+            if (last && last.who === who && last.text === text) return;
+            transcript.push({ who: who, text: text });
+          },
+          onDisconnect: function () { endCall(); },
+          onError: function (e) { console.error("ConvAI Fehler:", e); }
+        });
+      }).then(function (conv) {
+        conversation = conv;
+      }).catch(function (e) {
+        console.error(e);
+        demoHint.textContent = "Der Anruf konnte nicht gestartet werden — bitte Mikrofon erlauben und erneut versuchen.";
+        setCallUI(false);
+        busy = false;
+      });
+    }
 
-        setTimeout(function () {
-          widget.click();
-          if (widget.shadowRoot) {
-            var inner = widget.shadowRoot.querySelector("button, [role='button']");
-            if (inner) inner.click();
-          }
-        }, 700);
-      };
-      document.body.appendChild(s);
-    });
+    btn.addEventListener("click", startCall);
+    hangup.addEventListener("click", endCall);
   })();
 
   // ── SCROLL FADE-IN ──
