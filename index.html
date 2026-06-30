@@ -332,6 +332,82 @@
     .trust-head { font-weight: 600; font-size: 1.05rem; }
     .trust-body { color: var(--muted); }
 
+    /* ── PERSON ── */
+    .person {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    .person-photo,
+    .person-photo-ph {
+      width: 100%;
+      max-width: 240px;
+      aspect-ratio: 4 / 5;
+      border-radius: var(--r);
+      display: block;
+    }
+    .person-photo {
+      object-fit: cover;
+      object-position: center 28%;
+      border: 1px solid var(--line);
+      filter: grayscale(15%) contrast(1.03);
+    }
+    .person-photo-ph {
+      border: 1px dashed var(--line);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--muted);
+      font-size: .85rem;
+      padding: 1rem;
+    }
+
+    /* ── STEPS (Pilot-Ablauf) ── */
+    .steps {
+      list-style: none;
+      counter-reset: step;
+      display: grid;
+      gap: 1.1rem;
+      margin-top: 1.5rem;
+    }
+    .steps li {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 2rem 1fr;
+      gap: .9rem;
+      align-items: start;
+    }
+    .steps li::before {
+      content: counter(step);
+      font-family: "Newsreader", Georgia, serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-soft);
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .pilot-facts {
+      margin-top: 1.6rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+    }
+    @media (min-width: 680px) {
+      .person {
+        grid-template-columns: 240px 1fr;
+        gap: 2.25rem;
+        align-items: center;
+      }
+    }
+
     /* ── FAQ ── */
     .faq-list {
       display: flex;
@@ -636,7 +712,7 @@
         </li>
         <li class="trust-item">
           <span class="trust-head">DSGVO-konform</span>
-          <span class="trust-body">Die Verarbeitung wird zu Beginn des Gesprächs angesagt. Gespeichert wird nur, was nötig ist.</span>
+          <span class="trust-body">Die Verarbeitung wird zu Beginn des Gesprächs angesagt, gespeichert wird nur, was nötig ist — keine sensiblen Daten. Auf Wunsch schließen wir einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO.</span>
         </li>
         <li class="trust-item">
           <span class="trust-head">Kostenlos und unverbindlich</span>
@@ -681,9 +757,10 @@
           <p class="faq-a">
             Ja. Zu Beginn jedes Gesprächs wird dem Anrufer mitgeteilt, dass ein digitaler
             Assistent am Apparat ist und das Gespräch verarbeitet wird — das ist Pflicht und
-            wird eingehalten. Die Verarbeitung läuft über europäische Server. Vor dem Start
-            schließen wir einen Auftragsverarbeitungsvertrag ab, der Ihre Pflichten als
-            Verantwortlicher abdeckt.
+            wird eingehalten. Vor dem Start schließen wir einen Auftragsverarbeitungsvertrag
+            nach Art. 28 DSGVO, der Ihre Pflichten als Verantwortlicher abdeckt. Erfasst wird
+            nur, was nötig ist — keine sensiblen Daten —, und am Ende des Tests wird meine
+            Kopie gelöscht.
           </p>
         </details>
 
@@ -746,9 +823,10 @@
         <details class="faq-item">
           <summary class="faq-q">Wer hat Zugriff auf die Gesprächsdaten?</summary>
           <p class="faq-a">
-            Nur Sie und ich. Die Verarbeitung läuft über europäische Server, es werden
-            keine Daten an Dritte weitergegeben. Die genauen Details besprechen wir vor
-            Beginn des Tests gemeinsam.
+            Nur Sie und ich — dazu die technischen Dienstleister, die den Assistenten
+            betreiben und über den Auftragsverarbeitungsvertrag nach Art. 28 DSGVO gebunden
+            sind. Verkauft oder zu Werbezwecken weitergegeben wird nichts. Die genauen
+            Details besprechen wir vor Beginn des Tests gemeinsam.
           </p>
         </details>
 
@@ -760,15 +838,51 @@
   <section class="section fade">
     <div class="wrap narrow">
       <h2 class="section-title">Wer dahintersteht</h2>
-      <p class="lead">
-        Ich bin Simon Brändle und arbeite in der Nähe von Kempten im Allgäu. Mich interessiert,
-        was so ein Telefonassistent im echten Betrieb leistet — nicht in der Demo, sondern bei
-        ganz normalen Anrufen, wie sie bei Ihnen jeden Tag eingehen.
-      </p>
-      <p class="lead">
-        Dafür suche ich ein paar Betriebe, die das in Ruhe ausprobieren. Es kostet Sie nichts
-        und Sie gehen keine Verpflichtung ein.
-      </p>
+      <div class="person">
+
+        <img class="person-photo" src="assets/simon-braendle.jpg"
+             alt="Simon Brändle aus Kempten" loading="lazy" />
+
+        <div class="person-text">
+          <p class="lead">
+            Mein Name ist Simon Brändle, ich komme aus Kempten und bin 14. Ich weiß: Einem so jungen
+            Menschen Verantwortung und Vertrauen zu geben, fällt nicht jedem leicht. Gerade hier ist
+            das Alter aber eher ein Vorteil.
+          </p>
+          <p class="lead">
+            Denn ich mache das aus Interesse und Leidenschaft — nicht, weil es mir jemand aufträgt.
+            Ich gebe alles dafür, dass das, was ich für Sie baue, wirklich zu Ihrem Betrieb passt:
+            dass am Ende kein Anruf mehr verloren geht und Sie abends einen Kopf freier haben. Lieber
+            ein Betrieb, dem ich wirklich geholfen habe, als zehn, bei denen es nur halb passt.
+          </p>
+          <p class="lead">
+            Ich bin kein anonymer Anbieter, den Sie nie zu Gesicht bekommen, sondern jemand von hier —
+            und Sie reden mit genau der Person, die den Assistenten gebaut hat. Kein Außendienstler,
+            der nächstes Jahr die Firma wechselt, sondern jemand, der direkt erreichbar ist und für
+            sein Ergebnis geradesteht. Passt Ihnen am Assistenten etwas nicht, sagen Sie es mir — und
+            ich stelle ihn nach, persönlich.
+          </p>
+          <p class="lead">
+            Ausprobieren kostet Sie nichts: Der Pilot ist kostenlos und unverbindlich. Sie hören an
+            echten Anrufen aus Ihrem Betrieb, ob es Ihnen hilft — und entscheiden dann.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SO LÄUFT DER PILOT -->
+  <section class="section section-quiet fade">
+    <div class="wrap narrow">
+      <h2 class="section-title">So läuft der Pilot</h2>
+      <p class="lead">Klar und ohne Überraschungen — vom ersten Gespräch bis live in Ihrem Betrieb:</p>
+      <ol class="steps">
+        <li><span>Kurzes Gespräch, in dem ich Ihre Basics sammle: Öffnungszeiten, häufige Fragen, gewünschte Abläufe (15–20 Minuten). Wenn es Ihnen lieber ist, komme ich dafür bei Ihnen vorbei — ich bin aus der Region.</span></li>
+        <li><span>Ich baue den Assistenten auf Ihren Betrieb — meist innerhalb eines Tages.</span></li>
+        <li><span>Wir richten die Rufumleitung ein, und der Assistent geht live.</span></li>
+        <li><span>Nach ein paar Wochen schauen wir gemeinsam drauf: Was hat er aufgefangen, passt alles?</span></li>
+      </ol>
+      <p class="pilot-facts">Kostenlos und unverbindlich · 4 bis 8 Wochen · jederzeit beendbar — Ihr Risiko: keins.</p>
     </div>
   </section>
 
