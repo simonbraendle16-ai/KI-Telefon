@@ -411,7 +411,7 @@
         </li>
         <li class="trust-item">
           <span class="trust-head">Nimmt Rückrufwünsche auf</span>
-          <span class="trust-body">Name, Anliegen, Nummer, beste Zeit — strukturiert, damit nichts verloren geht.</span>
+          <span class="trust-body">Name, Anliegen, Nummer, beste Zeit — strukturiert, damit nichts verloren geht. Dringende Rückrufe gehen priorisiert an Sie.</span>
         </li>
         <li class="trust-item">
           <span class="trust-head">Zusammenfassung nach jedem Anruf</span>
@@ -426,8 +426,8 @@
           <span class="trust-body">Keine Täuschung. Zu Beginn die DSGVO-Ansage, dann geht es los.</span>
         </li>
         <li class="trust-item">
-          <span class="trust-head">Monatlicher Kurzüberblick</span>
-          <span class="trust-body">Was reinkam und was er aufgefangen hat — damit Sie den Nutzen schwarz auf weiß sehen.</span>
+          <span class="trust-head">Wöchentlicher Bericht</span>
+          <span class="trust-body">Einmal pro Woche schwarz auf weiß, direkt aus dem Anruf-Protokoll: was reinkam, was er aufgefangen hat, welche Termin- und Rückrufwünsche er festgehalten hat.</span>
         </li>
       </ul>
     </div>
@@ -512,6 +512,61 @@
 
         <p style="margin:1.3rem 0 0; padding-top:1rem; border-top:1px solid var(--line); font-size:.92rem; color:var(--muted);">
           Passt Ihnen etwas nicht? Ein kurzer Hinweis genügt — dann justiere ich den Assistenten nach. Sie müssen nichts mitlesen, Sie können jederzeit.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUTOMATISCHE KETTE + WOCHEN-BERICHT -->
+  <section class="section section-quiet fade">
+    <div class="wrap narrow">
+      <h2 class="section-title">Was danach automatisch passiert</h2>
+      <p class="lead" style="max-width:720px;">
+        Sie geben das Telefon ab, ohne blind zu werden. Nach jedem Gespräch läuft im
+        Hintergrund dieselbe Kette — ohne dass jemand etwas anstoßen muss:
+      </p>
+      <ul class="trust" style="margin-top:2.25rem;">
+        <li class="trust-item">
+          <span class="trust-head">Sofort: die Zusammenfassung</span>
+          <span class="trust-body">Direkt nach dem Auflegen landet die Zusammenfassung — wie oben — als E-Mail bei Ihnen.</span>
+        </li>
+        <li class="trust-item">
+          <span class="trust-head">Bei dringenden Rückrufen: Vorrang</span>
+          <span class="trust-body">Hat ein Anrufer ein dringendes Anliegen hinterlassen, bekommen Sie dazu eine eigene, priorisierte Nachricht — und abends eine Liste der noch offenen Rückrufe.</span>
+        </li>
+        <li class="trust-item">
+          <span class="trust-head">Am Abend: der Tagesüberblick</span>
+          <span class="trust-body">Alle Anrufe des Tages in wenigen Zeilen. Nichts verschwindet in einem Postfach-Stapel.</span>
+        </li>
+        <li class="trust-item">
+          <span class="trust-head">Einmal pro Woche: der Bericht</span>
+          <span class="trust-body">Die Woche in Zahlen, direkt aus dem Anruf-Protokoll. So sieht er aus:</span>
+        </li>
+      </ul>
+
+      <div style="background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:1.5rem 1.6rem; max-width:720px; margin-top:1.75rem; box-shadow:0 1px 2px rgba(0,0,0,.03);">
+        <div style="display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:.9rem; margin-bottom:1.2rem;">
+          <span style="font-size:.72rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--accent); background:var(--accent-soft); padding:.2rem .55rem; border-radius:6px;">Beispiel</span>
+          <span style="font-weight:600; color:var(--ink);">Wochen-Bericht &middot; Heimstein Hausverwaltung &middot; 29.06.&thinsp;&ndash;&thinsp;05.07.</span>
+        </div>
+
+        <dl style="margin:0; display:flex; flex-direction:column; gap:1.05rem;">
+          <div>
+            <dt style="font-size:.74rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); margin-bottom:.25rem;">Auf einen Blick</dt>
+            <dd style="margin:0; color:var(--ink);">23 Anrufe angenommen &middot; 9 Termin- und Rückrufwünsche festgehalten &middot; 17 Anliegen direkt geklärt &middot; 6 an das Team übergeben</dd>
+          </div>
+          <div>
+            <dt style="font-size:.74rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); margin-bottom:.25rem;">Häufigste Anliegen</dt>
+            <dd style="margin:0; color:var(--ink);">Reparaturmeldungen (8) &middot; Fragen zur Nebenkostenabrechnung (5) &middot; Öffnungszeiten und Mieterportal (4)</dd>
+          </div>
+          <div>
+            <dt style="font-size:.74rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); margin-bottom:.25rem;">Aufgefallen</dt>
+            <dd style="margin:0; color:var(--ink);">Fünf der neun Rückrufwünsche kamen außerhalb der Bürozeiten — Anrufe, die vorher auf dem Anrufbeantworter gelandet oder verloren gegangen wären.</dd>
+          </div>
+        </dl>
+
+        <p style="margin:1.3rem 0 0; padding-top:1rem; border-top:1px solid var(--line); font-size:.92rem; color:var(--muted);">
+          Die Zahlen stammen im echten Betrieb direkt aus dem Anruf-Protokoll — nichts wird geschätzt oder geschönt.
         </p>
       </div>
     </div>
@@ -634,8 +689,10 @@
         field("Ergebnis", d.ergebnis) +
         field("Aufgefallen", auf) + '</dl>';
       var foot = '<p style="margin:1.3rem 0 0;padding-top:1rem;border-top:1px solid var(--line);' +
-        'font-size:.92rem;color:var(--muted);">Genau so bekommen Sie im echten Betrieb jeden ' +
-        'Anruf aufbereitet &mdash; Sie müssen nichts mitlesen, können aber jederzeit.</p>';
+        'font-size:.92rem;color:var(--muted);">Erstellt aus Ihrem Gespräch von eben. Dieselbe ' +
+        'Nachricht bekommt der Betrieb nach jedem echten Anruf als E-Mail.</p>' +
+        '<p style="margin:.9rem 0 0;font-size:.95rem;">Wenn Sie das für Ihren Betrieb hören ' +
+        'wollen &mdash; <a class="contact-link" href="index.html#kontakt">schreiben Sie mir</a>.</p>';
       panel.innerHTML = shell(header() + dl + foot);
     }
 
