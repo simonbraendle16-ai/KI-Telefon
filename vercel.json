@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/kunde/:slug", "destination": "/kunde.html" }
+  ]
+}

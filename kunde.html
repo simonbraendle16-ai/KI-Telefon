@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Ihr Telefonassistent · Übersicht</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── TOKENS (Basis wie Landing-Page, --brand/--brand-soft kommen pro Betrieb aus dashboard_theme) ── */
+    :root {
+      --paper:      #f4f2ec;
+      --surface:    #fdfbf7;
+      --ink:        #1c2022;
+      --muted:      #58636b;
+      --brand:      #1e6b52;
+      --brand-soft: #cce8dd;
+      --line:       #e1dace;
+      --good:       #1e6b52;
+      --warn:       #a05a1c;
+      --max:        1080px;
+      --r:          12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { background: var(--paper); }
+    body {
+      background: var(--paper); color: var(--ink);
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 1rem; line-height: 1.6; -webkit-font-smoothing: antialiased;
+    }
+    h1, h2 { font-family: "Newsreader", Georgia, serif; font-weight: 500; letter-spacing: -0.015em; }
+    .wrap { max-width: var(--max); margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+    header.top { display: flex; flex-wrap: wrap; gap: 1rem; align-items: baseline; justify-content: space-between; margin-bottom: .5rem; }
+    .logo { font-family: "Newsreader", Georgia, serif; font-size: 1.35rem; color: var(--brand); font-weight: 600; }
+    h1 { font-size: 1.9rem; margin: .25rem 0 .25rem; }
+    .sub { color: var(--muted); font-size: .95rem; }
+
+    .ranges { display: flex; gap: .5rem; margin: 1.25rem 0 1.5rem; }
+    .ranges button {
+      font: inherit; font-size: .9rem; padding: .4rem .9rem; border-radius: 999px;
+      border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer;
+    }
+    .ranges button[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+    .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 1rem 1.15rem; }
+    .tile .label { font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+    .tile .value { font-family: "Newsreader", Georgia, serif; font-size: 2.1rem; line-height: 1.2; margin-top: .15rem; }
+    .tile .hint { font-size: .85rem; color: var(--muted); }
+
+    section { margin-top: 2.25rem; }
+    h2 { font-size: 1.35rem; margin-bottom: .75rem; }
+
+    .chart-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 1rem 1.15rem; }
+    .chart { display: flex; align-items: flex-end; gap: 6px; height: 130px; }
+    .chart .bar { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: .3rem; min-width: 0; }
+    .chart .bar i { display: block; width: 100%; max-width: 34px; background: var(--brand); border-radius: 4px 4px 0 0; min-height: 2px; }
+    .chart .bar.leer i { background: var(--line); }
+    .chart .bar b { font-size: .75rem; font-weight: 500; color: var(--ink); }
+    .chart .bar span { font-size: .7rem; color: var(--muted); white-space: nowrap; }
+
+    ul.rueckrufe { list-style: none; display: grid; gap: .6rem; }
+    ul.rueckrufe li {
+      background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--warn);
+      border-radius: var(--r); padding: .8rem 1rem; display: flex; flex-wrap: wrap; gap: .35rem 1rem; align-items: center;
+    }
+    ul.rueckrufe .wer { font-weight: 600; }
+    ul.rueckrufe .was { color: var(--muted); flex: 1 1 200px; }
+    ul.rueckrufe button {
+      font: inherit; font-size: .85rem; padding: .35rem .8rem; border-radius: 8px; cursor: pointer;
+      border: 1px solid var(--brand); background: transparent; color: var(--brand);
+    }
+    ul.rueckrufe button:hover { background: var(--brand-soft); }
+    .leer-hinweis { color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: var(--r); padding: .9rem 1rem; }
+
+    .calls details {
+      background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+      margin-bottom: .6rem; overflow: hidden;
+    }
+    .calls summary {
+      list-style: none; cursor: pointer; padding: .8rem 1rem;
+      display: grid; grid-template-columns: 7.5rem 1fr auto auto; gap: .5rem 1rem; align-items: center;
+    }
+    .calls summary::-webkit-details-marker { display: none; }
+    .calls summary:hover { background: var(--brand-soft); }
+    .calls .zeit { color: var(--muted); font-size: .85rem; }
+    .calls .wer { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .calls .dauer { color: var(--muted); font-size: .85rem; }
+    .badge { font-size: .75rem; padding: .15rem .6rem; border-radius: 999px; white-space: nowrap; }
+    .badge.selbst   { background: var(--brand-soft); color: var(--brand); }
+    .badge.offen    { background: #f6e3cf; color: var(--warn); }
+    .badge.erledigt { background: #e7e5df; color: var(--muted); }
+    .calls .detail { border-top: 1px solid var(--line); padding: .9rem 1rem 1rem; display: grid; gap: .8rem; }
+    .calls .detail h3 { font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-bottom: .2rem; }
+    .calls .transkript { white-space: pre-wrap; font-size: .92rem; background: var(--paper); border-radius: 8px; padding: .8rem 1rem; max-height: 320px; overflow-y: auto; }
+    @media (max-width: 640px) { .calls summary { grid-template-columns: 1fr auto; } .calls .zeit, .calls .dauer { display: none; } }
+
+    footer { margin-top: 3rem; color: var(--muted); font-size: .85rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+    #status { margin: 2rem 0; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div>
+        <div class="logo" id="logo"></div>
+        <h1>Ihr Telefonassistent — Übersicht</h1>
+        <div class="sub" id="untertitel">Alle Anrufe, Zusammenfassungen und Rückrufe an einem Ort.</div>
+      </div>
+    </header>
+
+    <div id="status" class="leer-hinweis" hidden></div>
+
+    <main id="app" hidden>
+      <div class="ranges" role="group" aria-label="Zeitraum">
+        <button data-range="heute" aria-pressed="true">Heute</button>
+        <button data-range="7" aria-pressed="false">7 Tage</button>
+        <button data-range="30" aria-pressed="false">30 Tage</button>
+      </div>
+
+      <div class="tiles" id="tiles"></div>
+
+      <section id="chart-sec" hidden>
+        <h2>Anrufe pro Tag</h2>
+        <div class="chart-card"><div class="chart" id="chart"></div></div>
+      </section>
+
+      <section>
+        <h2>Rückrufe für Sie <span class="sub" id="rr-anzahl"></span></h2>
+        <ul class="rueckrufe" id="rueckrufe"></ul>
+        <div class="leer-hinweis" id="rr-leer" hidden>Nichts offen — alle Anliegen sind erledigt oder wurden direkt beantwortet.</div>
+      </section>
+
+      <section>
+        <h2>Alle Anrufe im Zeitraum</h2>
+        <div class="calls" id="calls"></div>
+        <div class="leer-hinweis" id="calls-leer" hidden>Im gewählten Zeitraum gab es keine Anrufe.</div>
+      </section>
+
+      <footer>Aktualisiert sich bei jedem Aufruf. Fragen? Einfach anrufen oder mailen — Simon Brändle.</footer>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      var pfad = location.pathname.match(/\/kunde\/([a-z0-9-]+)/i);
+      var params = new URLSearchParams(location.search);
+      var slug = (pfad && pfad[1]) || params.get("slug") || "";
+      var key = params.get("key") || "";
+      var admin = params.get("admin") || "";
+      var range = "heute";
+      var statusEl = document.getElementById("status");
+      var app = document.getElementById("app");
+
+      function zeige(text) { statusEl.hidden = false; statusEl.textContent = text; }
+
+      if (!slug || !key) { zeige("Dieser Link ist unvollständig. Bitte den Zugangslink verwenden, den Sie von uns erhalten haben."); return; }
+
+      var fmtZeit = new Intl.DateTimeFormat("de-DE", { hour: "2-digit", minute: "2-digit" });
+      var fmtTag = new Intl.DateTimeFormat("de-DE", { weekday: "short", day: "2-digit", month: "2-digit" });
+
+      function esc(s) {
+        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+        });
+      }
+      function minuten(sek) { return Math.round((sek || 0) / 60 * 10) / 10; }
+      function istOffen(a) { return a.rueckruf_wunsch && a.status !== "erledigt"; }
+
+      function tile(label, value, hint) {
+        return '<div class="tile"><div class="label">' + esc(label) + '</div>' +
+          '<div class="value">' + esc(value) + '</div>' +
+          (hint ? '<div class="hint">' + esc(hint) + '</div>' : '') + '</div>';
+      }
+
+      function render(data) {
+        var anrufe = data.anrufe || [];
+        var theme = data.theme || {};
+        if (theme.farbe_primaer) document.documentElement.style.setProperty("--brand", theme.farbe_primaer);
+        if (theme.farbe_soft) document.documentElement.style.setProperty("--brand-soft", theme.farbe_soft);
+        document.getElementById("logo").textContent = theme.logo_text || data.betrieb;
+        document.title = data.betrieb + " · Telefonassistent";
+
+        var gesamt = anrufe.length;
+        var selbst = anrufe.filter(function (a) { return a.selbst_beantwortet; }).length;
+        var offen = anrufe.filter(istOffen).length;
+        var minSumme = anrufe.reduce(function (s, a) { return s + (a.dauer_sekunden || 0); }, 0);
+        var quote = gesamt ? Math.round(selbst / gesamt * 100) + " %" : "–";
+
+        var t = tile("Anrufe angenommen", gesamt, range === "heute" ? "heute" : "letzte " + range + " Tage") +
+          tile("Direkt beantwortet", quote, selbst + " von " + gesamt + " ohne Rückruf erledigt") +
+          tile("Offene Rückrufe", offen, offen ? "wartet auf Sie" : "alles erledigt") +
+          tile("Übernommene Gesprächszeit", minuten(minSumme) + " min", "Zeit, die Ihr Team nicht am Telefon war");
+        if (data.admin) {
+          var kosten = anrufe.reduce(function (s, a) { return s + (Number(a.kosten_credits) || 0); }, 0);
+          t += tile("Kosten (intern)", kosten.toFixed(2) + " Cr.", "nur in der Admin-Ansicht sichtbar");
+        }
+        document.getElementById("tiles").innerHTML = t;
+
+        // Balken "Anrufe pro Tag" nur bei Mehrtages-Zeitraum
+        var chartSec = document.getElementById("chart-sec");
+        if (range !== "heute") {
+          var tage = parseInt(range, 10);
+          var proTag = {}, reihenfolge = [];
+          for (var i = tage - 1; i >= 0; i--) {
+            var d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - i);
+            var k = d.toISOString().slice(0, 10);
+            proTag[k] = 0; reihenfolge.push({ k: k, d: d });
+          }
+          anrufe.forEach(function (a) {
+            var k = String(a.created_at).slice(0, 10);
+            if (k in proTag) proTag[k]++;
+          });
+          var max = Math.max.apply(null, reihenfolge.map(function (r) { return proTag[r.k]; }).concat([1]));
+          var zeigeLabel = tage <= 7;
+          document.getElementById("chart").innerHTML = reihenfolge.map(function (r) {
+            var n = proTag[r.k];
+            var h = Math.max(2, Math.round(n / max * 100));
+            return '<div class="bar' + (n ? '' : ' leer') + '" title="' + fmtTag.format(r.d) + ': ' + n + ' Anrufe">' +
+              (n && (zeigeLabel || n === max) ? '<b>' + n + '</b>' : '') +
+              '<i style="height:' + h + 'px"></i>' +
+              (zeigeLabel ? '<span>' + esc(fmtTag.format(r.d)) + '</span>' : '') + '</div>';
+          }).join("");
+          chartSec.hidden = false;
+        } else {
+          chartSec.hidden = true;
+        }
+
+        // Rückruf-Liste
+        var offene = anrufe.filter(istOffen);
+        document.getElementById("rr-anzahl").textContent = offene.length ? "(" + offene.length + " offen)" : "";
+        document.getElementById("rr-leer").hidden = offene.length > 0;
+        document.getElementById("rueckrufe").innerHTML = offene.map(function (a) {
+          return '<li><span class="wer">' + esc(a.anrufer_name && a.anrufer_name !== "-" ? a.anrufer_name : "Unbekannter Anrufer") + '</span>' +
+            '<span>' + esc(a.anrufer_nummer || "") + '</span>' +
+            '<span class="was">' + esc(a.anliegen || "") + '</span>' +
+            '<button data-id="' + a.id + '">Als erledigt markieren</button></li>';
+        }).join("");
+
+        // Anrufliste
+        document.getElementById("calls-leer").hidden = gesamt > 0;
+        document.getElementById("calls").innerHTML = anrufe.map(function (a) {
+          var badge = a.selbst_beantwortet
+            ? '<span class="badge selbst">selbst beantwortet</span>'
+            : (istOffen(a) ? '<span class="badge offen">Rückruf offen</span>'
+              : '<span class="badge erledigt">erledigt</span>');
+          var d = new Date(a.created_at);
+          return '<details><summary>' +
+            '<span class="zeit">' + esc(fmtTag.format(d)) + " · " + esc(fmtZeit.format(d)) + '</span>' +
+            '<span class="wer">' + esc(a.anrufer_name && a.anrufer_name !== "-" ? a.anrufer_name : (a.anrufer_nummer || "Unbekannt")) +
+            (a.anliegen ? ' — <span style="font-weight:400;color:var(--muted)">' + esc(a.anliegen) + '</span>' : '') + '</span>' +
+            '<span class="dauer">' + (a.dauer_sekunden ? minuten(a.dauer_sekunden) + " min" : "") +
+            (data.admin && a.kosten_credits != null ? " · " + Number(a.kosten_credits).toFixed(2) + " Cr." : "") + '</span>' +
+            badge + '</summary>' +
+            '<div class="detail">' +
+            (a.zusammenfassung ? '<div><h3>Zusammenfassung</h3><div>' + esc(a.zusammenfassung) + '</div></div>' : '') +
+            (a.transkript ? '<div><h3>Gesprächsverlauf</h3><div class="transkript">' + esc(a.transkript) + '</div></div>' : '') +
+            ((!a.zusammenfassung && !a.transkript) ? '<div class="sub">Zu diesem Anruf liegen keine Details vor.</div>' : '') +
+            '</div></details>';
+        }).join("");
+
+        statusEl.hidden = true;
+        app.hidden = false;
+      }
+
+      function laden() {
+        zeige("Lade Ihre Übersicht …");
+        var url = "/api/dashboard?slug=" + encodeURIComponent(slug) + "&key=" + encodeURIComponent(key) +
+          "&range=" + range + (admin ? "&admin=" + encodeURIComponent(admin) : "");
+        fetch(url).then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+          .then(function (res) {
+            if (!res.ok) { app.hidden = true; zeige(res.j && res.j.error === "Kein Zugriff." ? "Kein Zugriff — bitte den vollständigen Zugangslink verwenden." : "Die Übersicht konnte nicht geladen werden. Bitte später erneut versuchen."); return; }
+            render(res.j);
+          })
+          .catch(function () { app.hidden = true; zeige("Keine Verbindung. Bitte später erneut versuchen."); });
+      }
+
+      document.querySelector(".ranges").addEventListener("click", function (e) {
+        var b = e.target.closest("button[data-range]");
+        if (!b) return;
+        range = b.dataset.range;
+        document.querySelectorAll(".ranges button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+        laden();
+      });
+
+      document.getElementById("rueckrufe").addEventListener("click", function (e) {
+        var b = e.target.closest("button[data-id]");
+        if (!b) return;
+        b.disabled = true; b.textContent = "…";
+        fetch("/api/rueckruf-erledigt", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slug: slug, key: key, anruf_id: Number(b.dataset.id) })
+        }).then(function (r) {
+          if (!r.ok) throw new Error("fail");
+          laden();
+        }).catch(function () { b.disabled = false; b.textContent = "Als erledigt markieren"; });
+      });
+
+      laden();
+    })();
+  </script>
+</body>
+</html>
