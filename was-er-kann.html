@@ -681,6 +681,78 @@
         'Anruf automatisch.</p>');
     }
 
+    function cardHeader(badge, title) {
+      return '<div style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;' +
+        'border-bottom:1px solid var(--line);padding-bottom:.9rem;margin-bottom:1.2rem;">' +
+        '<span style="font-size:.72rem;font-weight:700;letter-spacing:.05em;' +
+        'text-transform:uppercase;color:var(--accent);background:var(--accent-soft);' +
+        'padding:.2rem .55rem;border-radius:6px;">' + badge + '</span>' +
+        '<span style="font-weight:600;color:var(--ink);">' + title + '</span></div>';
+    }
+
+    function icsHref(t) {
+      var start = new Date(t.start_iso);
+      if (isNaN(start.getTime())) return null;
+      var end = new Date(start.getTime() + (t.dauer_minuten || 30) * 60000);
+      function fmt(d) {
+        return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + "T" +
+          pad(d.getHours()) + pad(d.getMinutes()) + "00";
+      }
+      function pad(n) { return (n < 10 ? "0" : "") + n; }
+      var ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//KI-Telefonassistent Demo//DE",
+        "BEGIN:VEVENT",
+        "UID:demo-" + Date.now() + "@ki-telefon.vercel.app",
+        "DTSTART:" + fmt(start),
+        "DTEND:" + fmt(end),
+        "SUMMARY:" + String(t.beschreibung || "Demo-Termin").replace(/[\n,;]/g, " "),
+        "DESCRIPTION:Im Demo-Anruf mit dem KI-Telefonassistenten vereinbart.",
+        "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+      return "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
+    }
+
+    function extraCards(d) {
+      var html = "";
+      var e = d.erfasst || {};
+      var hasErfasst = ["name", "rueckrufnummer", "anliegen", "dringlichkeit"].some(function (k) {
+        return e[k] && e[k] !== "-";
+      });
+      if (hasErfasst) {
+        html += shell(cardHeader("Ihr Anruf", "So landet es im System") +
+          '<dl style="margin:0;display:flex;flex-direction:column;gap:1.05rem;">' +
+          field("Name", e.name) + field("Anliegen", e.anliegen) +
+          field("Rückrufnummer", e.rueckrufnummer) + field("Dringlichkeit", e.dringlichkeit) +
+          '</dl>' +
+          '<p style="margin:1.3rem 0 0;padding-top:1rem;border-top:1px solid var(--line);' +
+          'font-size:.92rem;color:var(--muted);">Strukturiert statt Zettelwirtschaft &mdash; im ' +
+          'echten Betrieb steht das so im Anruf-Protokoll. Nur was Sie gesagt haben; nichts wird erfunden.</p>');
+      }
+      if (d.termin) {
+        var href = d.termin.start_iso ? icsHref(d.termin) : null;
+        html += shell(cardHeader("Ihr Anruf", "Termin festgehalten") +
+          '<p style="margin:0;color:var(--ink);">' + esc(d.termin.beschreibung) +
+          (d.termin.start_iso ? ' &mdash; ' + esc(new Date(d.termin.start_iso).toLocaleString("de-DE",
+            { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })) + ' Uhr' : '') + '</p>' +
+          (href ? '<p style="margin:1rem 0 0;"><a class="contact-link" download="demo-termin.ics" href="' +
+            href + '">In meinen Kalender übernehmen &darr;</a></p>' : '') +
+          '<p style="margin:1rem 0 0;font-size:.92rem;color:var(--muted);">Im echten Betrieb ' +
+          'landet der Termin direkt im Kalender des Betriebs.</p>');
+      }
+      if (transcript.length >= 2) {
+        var lines = transcript.map(function (t) {
+          var who = t.who === "Assistent" ? "Lisa" : "Sie";
+          return '<p style="margin:.55rem 0;color:var(--ink);"><strong>' + who + ':</strong> ' +
+            esc(t.text) + '</p>';
+        }).join("");
+        html += shell('<details><summary style="cursor:pointer;font-weight:600;color:var(--ink);">' +
+          'Wortlaut des Gesprächs ansehen</summary>' +
+          '<div style="margin-top:1rem;border-top:1px solid var(--line);padding-top:.8rem;">' + lines +
+          '</div></details>' +
+          '<p style="margin:1rem 0 0;font-size:.92rem;color:var(--muted);">Nichts passiert hinter ' +
+          'Ihrem Rücken &mdash; Sie können jederzeit bis auf den Wortlaut schauen.</p>');
+      }
+      return html;
+    }
+
     function showDigest(d) {
       var auf = (d.auffaelligkeit && d.auffaelligkeit !== "-") ? d.auffaelligkeit : "Nichts Besonderes.";
       var dl = '<dl style="margin:0;display:flex;flex-direction:column;gap:1.05rem;">' +
@@ -690,10 +762,11 @@
         field("Aufgefallen", auf) + '</dl>';
       var foot = '<p style="margin:1.3rem 0 0;padding-top:1rem;border-top:1px solid var(--line);' +
         'font-size:.92rem;color:var(--muted);">Erstellt aus Ihrem Gespräch von eben. Dieselbe ' +
-        'Nachricht bekommt der Betrieb nach jedem echten Anruf als E-Mail.</p>' +
-        '<p style="margin:.9rem 0 0;font-size:.95rem;">Wenn Sie das für Ihren Betrieb hören ' +
-        'wollen &mdash; <a class="contact-link" href="index.html#kontakt">schreiben Sie mir</a>.</p>';
-      panel.innerHTML = shell(header() + dl + foot);
+        'Nachricht bekommt der Betrieb nach jedem echten Anruf als E-Mail.</p>';
+      var cta = '<p style="margin:1.9rem auto 0;max-width:720px;font-size:.95rem;text-align:left;">' +
+        'Wenn Sie das für Ihren Betrieb hören wollen &mdash; ' +
+        '<a class="contact-link" href="index.html#kontakt">schreiben Sie mir</a>.</p>';
+      panel.innerHTML = shell(header() + dl + foot) + extraCards(d) + cta;
     }
 
     function buildDigest() {
