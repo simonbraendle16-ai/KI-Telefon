@@ -573,6 +573,62 @@
   </section>
 
   <!-- COCKPIT (Proof: eigene Übersichtsseite) -->
+  <style>
+    /* Die Vorschau läuft bewusst in den Farben eines Musterbetriebs (Navy/Gold),
+       nicht in denen dieser Seite — genau das ist die Aussage „in Ihren Farben". */
+    .cockpit {
+      --c-brand:#1e3f63; --c-brand-deep:#14293f; --c-soft:#e4ebf3;
+      --c-s1:#3b7fc4; --c-s2:#b8862b; --c-track:#dbe6f2;
+      --c-card:#fff; --c-ink:#131820; --c-muted:#5c6773; --c-line:#e6eaf0;
+      max-width:760px; margin-top:1.75rem; border-radius:14px; overflow:hidden;
+      border:1px solid var(--line); background:var(--c-card);
+      box-shadow:0 1px 2px rgba(20,30,45,.05), 0 18px 40px -22px rgba(20,30,45,.35);
+      font-family:"Inter",system-ui,sans-serif; color:var(--c-ink);
+    }
+    .cockpit-band {
+      background:linear-gradient(140deg,var(--c-brand) 0%,var(--c-brand-deep) 100%);
+      color:#fff; padding:1.1rem 1.3rem 1.35rem;
+    }
+    .cockpit-band .row { display:flex; align-items:center; gap:.65rem; flex-wrap:wrap; }
+    .cockpit-band .dot {
+      width:30px; height:30px; border-radius:8px; flex-shrink:0; display:grid; place-items:center;
+      background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25);
+      font-weight:600; font-size:.78rem; color:#fff;
+    }
+    .cockpit-band .nm { font-weight:600; font-size:.95rem; }
+    .cockpit-band .nm small { display:block; font-size:.6rem; letter-spacing:.13em; text-transform:uppercase; color:rgba(255,255,255,.6); }
+    .cockpit-band .live { margin-left:auto; display:inline-flex; align-items:center; gap:.4rem; font-size:.75rem;
+      color:rgba(255,255,255,.85); background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18);
+      padding:.25rem .7rem; border-radius:999px; }
+    .cockpit-band .live i { width:6px; height:6px; border-radius:50%; background:#c8a24b; }
+    .cockpit-hero { margin-top:1.1rem; display:flex; align-items:flex-end; gap:.85rem; flex-wrap:wrap; }
+    .cockpit-hero .big { font-size:2.7rem; font-weight:600; line-height:.95; letter-spacing:-.03em; }
+    .cockpit-hero .lb { font-size:.85rem; color:rgba(255,255,255,.8); padding-bottom:.25rem; }
+    .cockpit-hero .dl { font-size:.72rem; font-weight:600; background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.18); padding:.15rem .55rem; border-radius:999px; margin-bottom:.3rem; }
+
+    .cockpit-body { padding:1.3rem 1.4rem 1.4rem; display:grid; gap:1.4rem; }
+    .cockpit-split2 { display:grid; gap:1.4rem; }
+    @media (min-width:640px) { .cockpit-split2 { grid-template-columns:auto 1fr; gap:1.9rem; align-items:center; } }
+    .cockpit h4 { font-size:.72rem; letter-spacing:.05em; text-transform:uppercase; color:var(--c-muted);
+      margin-bottom:.75rem; font-weight:600; font-family:"Inter",sans-serif; }
+    .cockpit .facts { font-size:.87rem; line-height:1.85; color:var(--c-muted); }
+    .cockpit .facts strong { color:var(--c-ink); float:right; }
+    .cockpit .sw { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:.45rem; }
+    .cockpit .meter { position:relative; width:104px; height:104px; }
+    .cockpit .meter .ctr { position:absolute; inset:0; display:grid; place-items:center; text-align:center; }
+    .cockpit .meter b { display:block; font-size:1.22rem; font-weight:600; line-height:1.1; }
+    .cockpit .meter span { display:block; font-size:.56rem; color:var(--c-muted); line-height:1.2; margin-top:1px; }
+    /* 2px Lücke in der Flächenfarbe trennt die Segmente — kein Rahmen */
+    .cockpit .bar { display:flex; gap:2px; height:38px; }
+    .cockpit .bar div { display:flex; align-items:center; padding:0 .75rem; color:#fff; font-weight:600; font-size:.85rem; }
+    .cockpit .bar div:first-child { background:var(--c-s1); border-radius:9px 3px 3px 9px; }
+    .cockpit .bar div:last-child  { background:var(--c-s2); border-radius:3px 9px 9px 3px; }
+    .cockpit .barleg { display:flex; flex-wrap:wrap; gap:.3rem 1.4rem; margin-top:.7rem; font-size:.82rem; color:var(--c-muted); }
+    .cockpit .sep { border-top:1px solid var(--c-line); }
+    .cockpit-cap { padding:1.1rem 1.4rem 1.3rem; border-top:1px solid var(--c-line); font-size:.9rem; color:var(--c-muted); background:#fbfcfd; }
+  </style>
+
   <section class="section fade">
     <div class="wrap narrow">
       <h2 class="section-title">Und alles an einem Ort: Ihr Cockpit</h2>
@@ -582,53 +638,93 @@
         Kein Login, kein Passwort: ein Lesezeichen genügt.
       </p>
 
-      <div style="background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:1.4rem 1.5rem 1.6rem; max-width:720px; margin-top:1.75rem; box-shadow:0 1px 2px rgba(0,0,0,.03);">
-        <div style="display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; border-bottom:1px solid var(--line); padding-bottom:.9rem; margin-bottom:1.3rem;">
-          <span style="width:30px; height:30px; border-radius:8px; background:var(--accent); color:#fff; font-weight:700; font-size:.82rem; display:grid; place-items:center; flex-shrink:0;">HH</span>
-          <span style="font-weight:600; color:var(--ink);">Heimstein Hausverwaltung &middot; Übersicht</span>
-          <span style="margin-left:auto; display:inline-flex; align-items:center; gap:.4rem; font-size:.8rem; color:var(--muted);">
-            <span style="width:8px; height:8px; border-radius:50%; background:var(--accent);"></span> Live &middot; 7 Tage
-          </span>
+      <div class="cockpit">
+        <div class="cockpit-band">
+          <div class="row">
+            <span class="dot">HH</span>
+            <span class="nm">Heimstein Hausverwaltung<small>Telefonassistent</small></span>
+            <span class="live"><i></i> Live &middot; 7 Tage</span>
+          </div>
+          <div class="cockpit-hero">
+            <span class="big">23</span>
+            <span class="lb">Anrufe angenommen</span>
+            <span class="dl">&uarr; +5 vs. Vorwoche</span>
+          </div>
         </div>
 
-        <div style="display:flex; gap:1.75rem; flex-wrap:wrap; align-items:center;">
-          <div style="flex:0 0 auto;">
-            <div style="font-size:2.9rem; line-height:1; font-weight:600; font-family:'Newsreader',Georgia,serif; color:var(--ink);">23</div>
-            <div style="font-size:.9rem; color:var(--muted); margin-top:.25rem;">Anrufe angenommen</div>
-          </div>
-
-          <div style="display:flex; align-items:center; gap:.9rem;">
-            <div style="position:relative; width:96px; height:96px; flex-shrink:0;">
-              <svg viewBox="0 0 100 100" style="width:100%; height:100%; transform:rotate(-90deg);" aria-hidden="true">
-                <circle cx="50" cy="50" r="42" fill="none" stroke="var(--line)" stroke-width="13"/>
-                <circle cx="50" cy="50" r="42" fill="none" stroke="var(--accent)" stroke-width="13" stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="68.6"/>
+        <div class="cockpit-body">
+          <div class="cockpit-split2">
+            <div class="meter">
+              <svg viewBox="0 0 104 104" style="width:100%; height:100%; transform:rotate(-90deg);" aria-hidden="true">
+                <circle cx="52" cy="52" r="44" fill="none" stroke="var(--c-track)" stroke-width="11"/>
+                <circle cx="52" cy="52" r="44" fill="none" stroke="var(--c-s1)" stroke-width="11"
+                        stroke-linecap="round" stroke-dasharray="276.5" stroke-dashoffset="71.9"/>
               </svg>
-              <div style="position:absolute; inset:0; display:grid; place-items:center; text-align:center;">
-                <div><b style="font-size:1.25rem; font-weight:600; color:var(--ink);">74&thinsp;%</b><span style="display:block; font-size:.62rem; color:var(--muted);">direkt erledigt</span></div>
+              <div class="ctr"><div><b>74&thinsp;%</b><span>direkt erledigt</span></div></div>
+            </div>
+            <div>
+              <h4>Direkt erledigt</h4>
+              <div class="facts">
+                <div><span class="sw" style="background:var(--c-s1)"></span>Selbst beantwortet <strong>17</strong></div>
+                <div><span class="sw" style="background:var(--c-track)"></span>An Sie übergeben <strong>6</strong></div>
               </div>
             </div>
-            <div style="font-size:.88rem; line-height:1.7;">
-              <div><span style="display:inline-block; width:10px; height:10px; border-radius:3px; background:var(--accent); margin-right:.4rem;"></span>Selbst beantwortet <strong>17</strong></div>
-              <div><span style="display:inline-block; width:10px; height:10px; border-radius:3px; background:var(--line); margin-right:.4rem;"></span>An Sie übergeben <strong>6</strong></div>
+          </div>
+
+          <div class="sep"></div>
+
+          <div>
+            <h4>Erreichbarkeit rund um die Uhr</h4>
+            <div class="bar">
+              <div style="flex:9">9</div>
+              <div style="flex:14">14</div>
+            </div>
+            <div class="barleg">
+              <span><span class="sw" style="background:var(--c-s1)"></span>Außerhalb der Bürozeiten <strong style="color:var(--c-ink)">9</strong></span>
+              <span><span class="sw" style="background:var(--c-s2)"></span>Während der Bürozeiten <strong style="color:var(--c-ink)">14</strong></span>
             </div>
           </div>
-        </div>
 
-        <div style="margin-top:1.5rem; padding-top:1.2rem; border-top:1px solid var(--line);">
-          <div style="font-size:.8rem; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); margin-bottom:.7rem;">Anrufe pro Tag</div>
-          <div style="display:flex; align-items:flex-end; gap:8px; height:96px;">
-            <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:.35rem;"><i style="width:100%; max-width:30px; height:64px; background:var(--accent); border-radius:4px 4px 0 0; display:block;"></i><span style="font-size:.7rem; color:var(--muted);">Mo</span></div>
-            <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:.35rem;"><i style="width:100%; max-width:30px; height:80px; background:var(--accent); border-radius:4px 4px 0 0; display:block;"></i><span style="font-size:.7rem; color:var(--muted);">Di</span></div>
-            <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:.35rem;"><i style="width:100%; max-width:30px; height:48px; background:var(--accent); border-radius:4px 4px 0 0; display:block;"></i><span style="font-size:.7rem; color:var(--muted);">Mi</span></div>
-            <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:.35rem;"><i style="width:100%; max-width:30px; height:64px; background:var(--accent); border-radius:4px 4px 0 0; display:block;"></i><span style="font-size:.7rem; color:var(--muted);">Do</span></div>
-            <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:.35rem;"><i style="width:100%; max-width:30px; height:48px; background:var(--accent); border-radius:4px 4px 0 0; display:block;"></i><span style="font-size:.7rem; color:var(--muted);">Fr</span></div>
-            <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:.35rem;"><i style="width:100%; max-width:30px; height:32px; background:var(--accent); border-radius:4px 4px 0 0; display:block;"></i><span style="font-size:.7rem; color:var(--muted);">Sa</span></div>
-            <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:.35rem;"><i style="width:100%; max-width:30px; height:32px; background:var(--accent); border-radius:4px 4px 0 0; display:block;"></i><span style="font-size:.7rem; color:var(--muted);">So</span></div>
+          <div class="sep"></div>
+
+          <div>
+            <h4>Anrufe pro Tag</h4>
+            <svg viewBox="0 0 640 160" style="width:100%; height:auto; display:block;" role="img" aria-label="Anrufe pro Tag: Montag 4, Dienstag 5, Mittwoch 3, Donnerstag 4, Freitag 3, Samstag 2, Sonntag 2">
+              <g font-family="Inter, sans-serif">
+                <line x1="30" y1="20"  x2="630" y2="20"  stroke="var(--c-line)" stroke-width="1"/>
+                <line x1="30" y1="66"  x2="630" y2="66"  stroke="var(--c-line)" stroke-width="1"/>
+                <line x1="30" y1="112" x2="630" y2="112" stroke="var(--c-line)" stroke-width="1"/>
+                <line x1="30" y1="130" x2="630" y2="130" stroke="#d3dae3" stroke-width="1"/>
+                <text x="22" y="24"  text-anchor="end" font-size="10" fill="#8a95a3">6</text>
+                <text x="22" y="70"  text-anchor="end" font-size="10" fill="#8a95a3">4</text>
+                <text x="22" y="116" text-anchor="end" font-size="10" fill="#8a95a3">2</text>
+                <text x="22" y="134" text-anchor="end" font-size="10" fill="#8a95a3">0</text>
+                <!-- Säulen: 24px, 4px Radius nur an der Kappe, Basis eckig -->
+                <path d="M63,130 V52 Q63,48 67,48 H83 Q87,48 87,52 V130 Z"     fill="var(--c-s1)"/>
+                <path d="M148,130 V29 Q148,25 152,25 H168 Q172,25 172,29 V130 Z" fill="var(--c-s1)"/>
+                <path d="M233,130 V75 Q233,71 237,71 H253 Q257,71 257,75 V130 Z" fill="var(--c-s1)"/>
+                <path d="M318,130 V52 Q318,48 322,48 H338 Q342,48 342,52 V130 Z" fill="var(--c-s1)"/>
+                <path d="M403,130 V75 Q403,71 407,71 H423 Q427,71 427,75 V130 Z" fill="var(--c-s1)"/>
+                <path d="M488,130 V98 Q488,94 492,94 H508 Q512,94 512,98 V130 Z" fill="var(--c-s1)"/>
+                <path d="M573,130 V98 Q573,94 577,94 H593 Q597,94 597,98 V130 Z" fill="var(--c-s1)"/>
+                <!-- Nur der Spitzenwert wird direkt beschriftet -->
+                <text x="160" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="var(--c-ink)">5</text>
+                <text x="75"  y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">Mo</text>
+                <text x="160" y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">Di</text>
+                <text x="245" y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">Mi</text>
+                <text x="330" y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">Do</text>
+                <text x="415" y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">Fr</text>
+                <text x="500" y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">Sa</text>
+                <text x="585" y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">So</text>
+              </g>
+            </svg>
           </div>
         </div>
 
-        <p style="margin:1.3rem 0 0; padding-top:1rem; border-top:1px solid var(--line); font-size:.92rem; color:var(--muted);">
-          So sieht das Cockpit für einen Musterbetrieb aus — Ihres zeigt Ihre echten Anrufe, in Ihren Farben. Darunter: die vollständige Liste aller Anrufe mit Zusammenfassung und, wenn Sie mögen, dem Wortlaut.
+        <p class="cockpit-cap">
+          So sieht das Cockpit für einen Musterbetrieb aus — Ihres zeigt Ihre echten Anrufe, in Ihren
+          Farben und mit Ihrem Namen. Darunter: die vollständige Liste aller Anrufe mit Zusammenfassung
+          und, wenn Sie mögen, dem Wortlaut.
         </p>
       </div>
     </div>
