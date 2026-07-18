@@ -363,9 +363,10 @@
     .cockpit-rahmen.is-full { display:flex; flex-direction:column; }
     .cockpit-rahmen.is-full iframe { height:auto; flex:1; }
     body.ck-offen { overflow:hidden; }
-    /* .fade.visible trägt ein transform — ein transformierter Vorfahre wird zum
-       Bezugsrahmen für position:fixed. Fürs Vollbild muss es weichen. */
-    body.ck-offen #cockpit { transform:none; filter:none; }
+    /* Fürs Vollbild wird der Rahmen per JS an den <body> gehängt. Grund: die
+       Sektion trägt über .fade.visible ein transform (als Identitätsmatrix, mit
+       Transition) — und schon das macht sie zum Bezugsrahmen für position:fixed,
+       sodass „inset:0" nur die Sektion statt den Bildschirm füllte. */
     .cockpit-hinweis { margin-top:1rem; font-size:.88rem; line-height:1.7; color:var(--muted); }
     @media (max-width:640px) { .cockpit-rahmen iframe { height:520px; } }
     @media (prefers-reduced-motion: reduce) { .cockpit-voll:hover { transform:none; } }
@@ -957,14 +958,30 @@
     if (!rahmen || !btn || !txt) return;
 
     var merkScroll = 0;
+    var platz = document.createComment("cockpit-platzhalter");
 
     function vollbild(an) {
-      if (an && !rahmen.classList.contains("is-full")) merkScroll = window.scrollY;
+      var offen = rahmen.classList.contains("is-full");
+      if (an === offen) return;
+
+      if (an) {
+        merkScroll = window.scrollY;
+        // Aus der Sektion herauslösen: dort wäre position:fixed an deren
+        // transform gebunden und würde nur die Sektion füllen.
+        rahmen.parentNode.insertBefore(platz, rahmen);
+        document.body.appendChild(rahmen);
+      }
+
       rahmen.classList.toggle("is-full", an);
       document.body.classList.toggle("ck-offen", an);
       txt.textContent = an ? "Schließen" : "Groß ansehen";
       btn.setAttribute("aria-expanded", an ? "true" : "false");
-      if (!an) window.scrollTo(0, merkScroll);
+
+      if (!an && platz.parentNode) {
+        platz.parentNode.insertBefore(rahmen, platz);
+        platz.parentNode.removeChild(platz);
+        window.scrollTo(0, merkScroll);
+      }
     }
 
     btn.addEventListener("click", function () {
