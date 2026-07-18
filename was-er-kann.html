@@ -338,6 +338,131 @@
       .btn-call { transition: none; }
       .fade { opacity: 1; transform: none; transition: none; }
     }
+    /* Die Vorschau läuft bewusst in den Farben eines Musterbetriebs (Navy/Gold),
+       nicht in denen dieser Seite — genau das ist die Aussage „in Ihren Farben". */
+    .cockpit {
+      --c-brand:#1e3f63; --c-brand-deep:#14293f; --c-soft:#e4ebf3;
+      --c-s1:#3b7fc4; --c-s2:#b8862b; --c-track:#dbe6f2;
+      --c-card:#fff; --c-ink:#131820; --c-muted:#5c6773; --c-line:#e6eaf0;
+      max-width:760px; margin-top:1.75rem; border-radius:14px; overflow:hidden;
+      border:1px solid var(--line); background:var(--c-card);
+      box-shadow:0 1px 2px rgba(20,30,45,.05), 0 18px 40px -22px rgba(20,30,45,.35);
+      font-family:"Inter",system-ui,sans-serif; color:var(--c-ink);
+    }
+    .cockpit-band {
+      background:linear-gradient(140deg,var(--c-brand) 0%,var(--c-brand-deep) 100%);
+      color:#fff; padding:1.1rem 1.3rem 1.35rem;
+    }
+    .cockpit-band .row { display:flex; align-items:center; gap:.65rem; flex-wrap:wrap; }
+    .cockpit-band .dot {
+      width:30px; height:30px; border-radius:8px; flex-shrink:0; display:grid; place-items:center;
+      background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25);
+      font-weight:600; font-size:.78rem; color:#fff;
+    }
+    .cockpit-band .nm { font-weight:600; font-size:.95rem; }
+    .cockpit-band .nm small { display:block; font-size:.6rem; letter-spacing:.13em; text-transform:uppercase; color:rgba(255,255,255,.6); }
+    .cockpit-band .live { margin-left:auto; display:inline-flex; align-items:center; gap:.4rem; font-size:.75rem;
+      color:rgba(255,255,255,.85); background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18);
+      padding:.25rem .7rem; border-radius:999px; }
+    .cockpit-band .live i { width:6px; height:6px; border-radius:50%; background:#c8a24b; }
+    .cockpit-hero { margin-top:1.1rem; display:flex; align-items:flex-end; gap:.85rem; flex-wrap:wrap; }
+    .cockpit-hero .big { font-size:2.7rem; font-weight:600; line-height:.95; letter-spacing:-.03em; }
+    .cockpit-hero .lb { font-size:.85rem; color:rgba(255,255,255,.8); padding-bottom:.25rem; }
+    .cockpit-hero .dl { font-size:.72rem; font-weight:600; background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.18); padding:.15rem .55rem; border-radius:999px; margin-bottom:.3rem; }
+
+    .cockpit-body { padding:1.3rem 1.4rem 1.4rem; display:grid; gap:1.4rem; }
+    .cockpit-split2 { display:grid; gap:1.4rem; }
+    @media (min-width:640px) { .cockpit-split2 { grid-template-columns:auto 1fr; gap:1.9rem; align-items:center; } }
+    .cockpit h4 { font-size:.72rem; letter-spacing:.05em; text-transform:uppercase; color:var(--c-muted);
+      margin-bottom:.75rem; font-weight:600; font-family:"Inter",sans-serif; }
+    .cockpit .facts { font-size:.87rem; line-height:1.85; color:var(--c-muted); }
+    .cockpit .facts strong { color:var(--c-ink); float:right; }
+    .cockpit .sw { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:.45rem; }
+    .cockpit .meter { position:relative; width:104px; height:104px; }
+    .cockpit .meter .ctr { position:absolute; inset:0; display:grid; place-items:center; text-align:center; }
+    .cockpit .meter b { display:block; font-size:1.22rem; font-weight:600; line-height:1.1; }
+    .cockpit .meter span { display:block; font-size:.56rem; color:var(--c-muted); line-height:1.2; margin-top:1px; }
+    /* 2px Lücke in der Flächenfarbe trennt die Segmente — kein Rahmen */
+    .cockpit .bar { display:flex; gap:2px; height:38px; }
+    .cockpit .bar div { display:flex; align-items:center; padding:0 .75rem; color:#fff; font-weight:600; font-size:.85rem; }
+    .cockpit .bar div:first-child { background:var(--c-s1); border-radius:9px 3px 3px 9px; }
+    .cockpit .bar div:last-child  { background:var(--c-s2); border-radius:3px 9px 9px 3px; }
+    .cockpit .barleg { display:flex; flex-wrap:wrap; gap:.3rem 1.4rem; margin-top:.7rem; font-size:.82rem; color:var(--c-muted); }
+    .cockpit .sep { border-top:1px solid var(--c-line); }
+    .cockpit-cap { padding:1.1rem 1.4rem 1.3rem; border-top:1px solid var(--c-line); font-size:.9rem; color:var(--c-muted); background:#fbfcfd; }
+
+    /* ── Interaktion: Zeitraum, Tabellenansicht, Rückrufe, Anrufliste ── */
+    .cockpit .ck-range { display:flex; gap:.35rem; margin-top:1.05rem; flex-wrap:wrap; }
+    .cockpit .ck-range button { font:inherit; font-size:.76rem; font-weight:600; color:rgba(255,255,255,.82);
+      background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); border-radius:999px;
+      padding:.28rem .82rem; cursor:pointer; transition:background .15s, color .15s; }
+    .cockpit .ck-range button:hover { background:rgba(255,255,255,.2); color:#fff; }
+    .cockpit .ck-range button.is-on { background:#fff; color:var(--c-brand); border-color:#fff; }
+    .cockpit .ck-h { display:flex; align-items:baseline; justify-content:space-between; gap:1rem; margin-bottom:.75rem; }
+    .cockpit .ck-h h4 { margin-bottom:0; }
+    .cockpit .ck-tbl { font:inherit; font-size:.72rem; font-weight:600; color:var(--c-muted); flex-shrink:0;
+      background:none; border:1px solid var(--c-line); border-radius:7px; padding:.2rem .62rem; cursor:pointer; }
+    .cockpit .ck-tbl:hover { color:var(--c-ink); border-color:#c8d2de; }
+    .cockpit .ck-tbl[aria-expanded="true"] { background:var(--c-soft); border-color:var(--c-soft); color:var(--c-brand); }
+    .cockpit table { width:100%; border-collapse:collapse; margin-top:.9rem; font-size:.82rem; font-variant-numeric:tabular-nums; }
+    .cockpit table th, .cockpit table td { text-align:left; padding:.36rem .5rem; border-bottom:1px solid var(--c-line); }
+    .cockpit table th { font-size:.7rem; letter-spacing:.04em; text-transform:uppercase; color:var(--c-muted); font-weight:600; }
+    .cockpit table td:last-child, .cockpit table th:last-child { text-align:right; }
+    .cockpit [hidden] { display:none; }
+    .cockpit .ck-todo { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:.5rem; }
+    .cockpit .ck-todo li { display:flex; align-items:center; gap:.7rem; padding:.68rem .85rem; font-size:.87rem;
+      border:1px solid var(--c-line); border-radius:10px; }
+    .cockpit .ck-todo li.is-done { opacity:.55; }
+    .cockpit .ck-todo li.is-done .t { text-decoration:line-through; }
+    .cockpit .ck-todo .t { line-height:1.5; }
+    .cockpit .ck-todo button { font:inherit; font-size:.72rem; font-weight:600; margin-left:auto; flex-shrink:0;
+      background:var(--c-soft); color:var(--c-brand); border:none; border-radius:7px; padding:.28rem .65rem; cursor:pointer; }
+    .cockpit .ck-todo button:hover { filter:brightness(.96); }
+    .cockpit .ck-todo .fertig { margin:0; font-size:.87rem; color:var(--c-muted); }
+    .cockpit .ck-calls details { border-top:1px solid var(--c-line); }
+    .cockpit .ck-calls details:last-of-type { border-bottom:1px solid var(--c-line); }
+    .cockpit .ck-calls summary { cursor:pointer; padding:.72rem .2rem; font-size:.87rem; line-height:1.5;
+      display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; list-style:none; }
+    .cockpit .ck-calls summary::-webkit-details-marker { display:none; }
+    .cockpit .ck-calls summary::after { content:"+"; margin-left:auto; color:var(--c-muted); font-size:1.05rem; padding-left:.5rem; }
+    .cockpit .ck-calls details[open] summary::after { content:"\2013"; }
+    .cockpit .ck-calls .zeit { color:var(--c-muted); font-variant-numeric:tabular-nums; font-size:.8rem; flex-shrink:0; }
+    .cockpit .ck-calls .tag { font-size:.68rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+      padding:.14rem .45rem; border-radius:5px; background:var(--c-soft); color:var(--c-brand); flex-shrink:0; }
+    .cockpit .ck-calls p { margin:0 .2rem 1rem; font-size:.87rem; line-height:1.7; color:var(--c-muted); }
+    /* ── Vollbild: das Cockpit legt sich ueber die Seite ── */
+    .cockpit .ck-full { font:inherit; font-size:.8rem; font-weight:700; letter-spacing:.01em;
+      color:#14293f; background:#c8a24b; border:1px solid #c8a24b; border-radius:999px;
+      padding:.44rem 1rem; cursor:pointer; flex-shrink:0; display:inline-flex; align-items:center; gap:.45rem;
+      box-shadow:0 1px 0 rgba(255,255,255,.25) inset, 0 4px 12px -4px rgba(0,0,0,.5);
+      transition:background .15s, transform .15s, box-shadow .15s; }
+    .cockpit .ck-full:hover { background:#d6b264; border-color:#d6b264; transform:translateY(-1px);
+      box-shadow:0 1px 0 rgba(255,255,255,.3) inset, 0 6px 16px -5px rgba(0,0,0,.55); }
+    .cockpit .ck-full:active { transform:translateY(0); }
+    .cockpit .ck-full svg { width:13px; height:13px; }
+    @media (prefers-reduced-motion: reduce) { .cockpit .ck-full:hover { transform:none; } }
+    .cockpit.is-full {
+      position:fixed; inset:0; z-index:997; max-width:none; margin:0;
+      border:none; border-radius:0; box-shadow:none;
+      overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch;
+    }
+    .cockpit.is-full:focus { outline:none; }
+    .cockpit.is-full .cockpit-band { position:sticky; top:0; z-index:2; }
+    .cockpit.is-full .cockpit-band,
+    .cockpit.is-full .cockpit-body,
+    .cockpit.is-full .cockpit-cap { width:100%; max-width:1040px; margin-left:auto; margin-right:auto; }
+    .cockpit.is-full .cockpit-body { padding-top:1.6rem; padding-bottom:2.5rem; }
+    body.ck-offen { overflow:hidden; }
+    /* .fade.visible traegt ein transform — ein transformierter Vorfahre wird zum
+       Bezugsrahmen fuer position:fixed. Fuers Vollbild muss es weichen. */
+    body.ck-offen #cockpit { transform:none; filter:none; }
+    @media (prefers-reduced-motion: reduce) { .cockpit .ck-full { transition:none; } }
+
+    .cockpit .ck-hint { font-size:.72rem; color:var(--c-muted); flex-shrink:0; }
+    .cockpit .ck-note { display:inline-flex; align-items:center; gap:.4rem; font-size:.7rem; font-weight:600;
+      letter-spacing:.04em; text-transform:uppercase; color:var(--c-muted);
+      border:1px solid var(--c-line); border-radius:6px; padding:.16rem .5rem; }
   </style>
 </head>
 <body>
@@ -475,8 +600,211 @@
     </div>
   </section>
 
+  <!-- COCKPIT (Proof: eigene Übersichtsseite — bedienbar, Beispieldaten) -->
+  <section class="section fade" id="cockpit">
+    <div class="wrap narrow">
+      <h2 class="section-title">Und alles an einem Ort: das Cockpit</h2>
+      <p class="lead" style="max-width:720px;">
+        Jeden Anruf, jede Zusammenfassung und jede Kennzahl sehen Sie jederzeit auf einer
+        geschützten Übersichtsseite — nur für Ihren Betrieb, in Ihren Farben. Unten steht die
+        von Heimstein, mit Zahlen aus dem Musterbetrieb. Sie können sie bedienen: Zeitraum
+        umschalten, Werte als Tabelle lesen, Anrufe aufklappen, Rückrufe abhaken.
+        Am besten schauen Sie sie sich groß an — oben rechts mit „Groß ansehen“ füllt sie den
+        ganzen Bildschirm, so wie Sie sie später im Alltag vor sich haben.
+      </p>
+
+      <div class="cockpit" id="cockpitDemo" tabindex="-1">
+        <div class="cockpit-band">
+          <div class="row">
+            <span class="dot">HH</span>
+            <span class="nm">Heimstein Hausverwaltung<small>Telefonassistent</small></span>
+            <span class="live"><i></i> <span data-ck="livelabel">Live &middot; 7 Tage</span></span>
+            <button type="button" class="ck-full" data-ck="fullBtn" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+              <span data-ck="fullText">Groß ansehen</span>
+            </button>
+          </div>
+          <div class="cockpit-hero">
+            <span class="big" data-ck="calls">23</span>
+            <span class="lb">Anrufe angenommen</span>
+            <span class="dl" data-ck="vgl">&uarr; +5 vs. Vorwoche</span>
+          </div>
+          <div class="ck-range" role="group" aria-label="Zeitraum wählen">
+            <button type="button" data-range="heute" aria-pressed="false">Heute</button>
+            <button type="button" data-range="d7" class="is-on" aria-pressed="true">7 Tage</button>
+            <button type="button" data-range="d30" aria-pressed="false">30 Tage</button>
+          </div>
+        </div>
+
+        <div class="cockpit-body">
+          <div>
+            <div class="ck-h">
+              <h4>Direkt erledigt</h4>
+              <button type="button" class="ck-tbl" data-tbl="tblDirekt" aria-expanded="false" aria-controls="tblDirekt">Tabelle</button>
+            </div>
+            <div class="cockpit-split2">
+              <div class="meter">
+                <svg viewBox="0 0 104 104" style="width:100%; height:100%; transform:rotate(-90deg);" aria-hidden="true">
+                  <circle cx="52" cy="52" r="44" fill="none" stroke="var(--c-track)" stroke-width="11"/>
+                  <circle cx="52" cy="52" r="44" fill="none" stroke="var(--c-s1)" stroke-width="11"
+                          stroke-linecap="round" stroke-dasharray="276.5" stroke-dashoffset="71.9" data-ck="meter"/>
+                </svg>
+                <div class="ctr"><div><b data-ck="quote">74&thinsp;%</b><span>direkt erledigt</span></div></div>
+              </div>
+              <div>
+                <div class="facts">
+                  <div><span class="sw" style="background:var(--c-s1)"></span>Selbst beantwortet <strong data-ck="direkt">17</strong></div>
+                  <div><span class="sw" style="background:var(--c-track)"></span>An Sie übergeben <strong data-ck="uebergeben">6</strong></div>
+                </div>
+              </div>
+            </div>
+            <div id="tblDirekt" hidden>
+              <table>
+                <thead><tr><th scope="col">Ausgang</th><th scope="col">Anrufe</th></tr></thead>
+                <tbody>
+                  <tr><td>Selbst beantwortet</td><td data-ck="direkt">17</td></tr>
+                  <tr><td>An Sie übergeben</td><td data-ck="uebergeben">6</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+
+          <div>
+            <div class="ck-h">
+              <h4>Erreichbarkeit rund um die Uhr</h4>
+              <button type="button" class="ck-tbl" data-tbl="tblZeit" aria-expanded="false" aria-controls="tblZeit">Tabelle</button>
+            </div>
+            <div class="bar">
+              <div data-ck="ausserhalbBar" style="flex:9">9</div>
+              <div data-ck="innerhalbBar" style="flex:14">14</div>
+            </div>
+            <div class="barleg">
+              <span><span class="sw" style="background:var(--c-s1)"></span>Außerhalb der Bürozeiten <strong style="color:var(--c-ink)" data-ck="ausserhalb">9</strong></span>
+              <span><span class="sw" style="background:var(--c-s2)"></span>Während der Bürozeiten <strong style="color:var(--c-ink)" data-ck="innerhalb">14</strong></span>
+            </div>
+            <div id="tblZeit" hidden>
+              <table>
+                <thead><tr><th scope="col">Zeitfenster</th><th scope="col">Anrufe</th></tr></thead>
+                <tbody>
+                  <tr><td>Außerhalb der Bürozeiten</td><td data-ck="ausserhalb">9</td></tr>
+                  <tr><td>Während der Bürozeiten</td><td data-ck="innerhalb">14</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+
+          <div>
+            <div class="ck-h">
+              <h4 data-ck="serieTitel">Anrufe pro Tag</h4>
+              <button type="button" class="ck-tbl" data-tbl="tblSerie" aria-expanded="false" aria-controls="tblSerie">Tabelle</button>
+            </div>
+            <svg viewBox="0 0 640 160" style="width:100%; height:auto; display:block;" role="img" data-ck="serieSvg"
+                 aria-label="Anrufe pro Tag: Montag 4, Dienstag 5, Mittwoch 3, Donnerstag 4, Freitag 3, Samstag 2, Sonntag 2">
+              <g font-family="Inter, sans-serif" data-ck="serieG">
+                <line x1="30" y1="20"  x2="630" y2="20"  stroke="var(--c-line)" stroke-width="1"/>
+                <line x1="30" y1="66"  x2="630" y2="66"  stroke="var(--c-line)" stroke-width="1"/>
+                <line x1="30" y1="112" x2="630" y2="112" stroke="var(--c-line)" stroke-width="1"/>
+                <line x1="30" y1="130" x2="630" y2="130" stroke="#d3dae3" stroke-width="1"/>
+                <text x="22" y="24"  text-anchor="end" font-size="10" fill="#8a95a3">6</text>
+                <text x="22" y="70"  text-anchor="end" font-size="10" fill="#8a95a3">4</text>
+                <text x="22" y="116" text-anchor="end" font-size="10" fill="#8a95a3">2</text>
+                <text x="22" y="134" text-anchor="end" font-size="10" fill="#8a95a3">0</text>
+                <path d="M63,130 V52 Q63,48 67,48 H83 Q87,48 87,52 V130 Z"     fill="var(--c-s1)"/>
+                <path d="M148,130 V29 Q148,25 152,25 H168 Q172,25 172,29 V130 Z" fill="var(--c-s1)"/>
+                <path d="M233,130 V75 Q233,71 237,71 H253 Q257,71 257,75 V130 Z" fill="var(--c-s1)"/>
+                <path d="M318,130 V52 Q318,48 322,48 H338 Q342,48 342,52 V130 Z" fill="var(--c-s1)"/>
+                <path d="M403,130 V75 Q403,71 407,71 H423 Q427,71 427,75 V130 Z" fill="var(--c-s1)"/>
+                <path d="M488,130 V98 Q488,94 492,94 H508 Q512,94 512,98 V130 Z" fill="var(--c-s1)"/>
+                <path d="M573,130 V98 Q573,94 577,94 H593 Q597,94 597,98 V130 Z" fill="var(--c-s1)"/>
+                <text x="160" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="var(--c-ink)">5</text>
+                <text x="75"  y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">Mo</text>
+                <text x="160" y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">Di</text>
+                <text x="245" y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">Mi</text>
+                <text x="330" y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">Do</text>
+                <text x="415" y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">Fr</text>
+                <text x="500" y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">Sa</text>
+                <text x="585" y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">So</text>
+              </g>
+            </svg>
+            <div id="tblSerie" hidden>
+              <table>
+                <thead><tr><th scope="col" data-ck="serieKopf">Tag</th><th scope="col">Anrufe</th></tr></thead>
+                <tbody data-ck="serieBody">
+                  <tr><td>Mo</td><td>4</td></tr>
+                  <tr><td>Di</td><td>5</td></tr>
+                  <tr><td>Mi</td><td>3</td></tr>
+                  <tr><td>Do</td><td>4</td></tr>
+                  <tr><td>Fr</td><td>3</td></tr>
+                  <tr><td>Sa</td><td>2</td></tr>
+                  <tr><td>So</td><td>2</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+
+          <div>
+            <div class="ck-h">
+              <h4>Offene Rückrufe <span data-ck="todoZahl">(2)</span></h4>
+              <span class="ck-hint">zeitraumunabhängig</span>
+            </div>
+            <ul class="ck-todo" data-ck="todo">
+              <li>
+                <span class="t"><strong>Frau Berger</strong> &middot; Lindauer Str. 12 — Heizung fällt seit gestern Abend aus, bittet um Rückruf.</span>
+                <button type="button">Erledigt</button>
+              </li>
+              <li>
+                <span class="t"><strong>Herr Sailer</strong> &middot; Bahnhofstr. 4 — Wasserschaden im Keller gemeldet, Handwerker soll kommen.</span>
+                <button type="button">Erledigt</button>
+              </li>
+            </ul>
+          </div>
+
+          <div class="sep"></div>
+
+          <div>
+            <div class="ck-h">
+              <h4>Die letzten Anrufe</h4>
+              <span class="ck-hint">aufklappen</span>
+            </div>
+            <div class="ck-calls">
+              <details>
+                <summary><span class="zeit">21:14</span><span class="tag">Rückruf</span> Wasserschaden im Keller gemeldet</summary>
+                <p>Herr Sailer meldet einen Wasserschaden im Keller der Bahnhofstr. 4. Lisa hat Adresse, Rückrufnummer und Dringlichkeit aufgenommen und angekündigt, dass sich jemand kümmert — ohne einen Termin zuzusagen. Anruf um 21:14 Uhr, also lange nach Feierabend.</p>
+              </details>
+              <details>
+                <summary><span class="zeit">16:42</span><span class="tag">Rückruf</span> Heizungsausfall Lindauer Str. 12</summary>
+                <p>Frau Berger, Mieterin, meldet den Ausfall der Heizung seit dem Vorabend. Lisa hat das Anliegen als technischen Defekt eingeordnet und an das Technik-Team übergeben. Zur Kostenfrage hat sie nichts zugesagt, sondern auf die Hausverwaltung verwiesen. Die Mieterin war spürbar verärgert — ein persönlicher Rückruf wäre hier sinnvoll.</p>
+              </details>
+              <details>
+                <summary><span class="zeit">11:20</span><span class="tag">Selbst erledigt</span> Frage zur Nebenkostenabrechnung</summary>
+                <p>Herr Kaltenbach wollte wissen, bis wann die Nebenkostenabrechnung kommt und an wen er Rückfragen richtet. Lisa hat den Zeitraum und die zuständige Adresse genannt. Kein Rückruf nötig.</p>
+              </details>
+              <details>
+                <summary><span class="zeit">08:05</span><span class="tag">Selbst erledigt</span> Anfrage zu freien Wohnungen</summary>
+                <p>Eine Interessentin fragte nach freien Zwei-Zimmer-Wohnungen. Lisa hat gesagt, dass aktuell keine frei ist, und angeboten, die Kontaktdaten für die Warteliste aufzunehmen. Die Anruferin hat zugestimmt.</p>
+              </details>
+            </div>
+          </div>
+        </div>
+
+        <p class="cockpit-cap">
+          <span class="ck-note">Beispieldaten</span>
+          Die Zahlen stammen aus dem Musterbetrieb Heimstein — Ihres zeigt Ihre echten Anrufe,
+          in Ihren Farben und mit Ihrem Namen. Als Pilotbetrieb bekommen Sie dafür einen
+          persönlichen Link; ein Lesezeichen genügt, ein Passwort brauchen Sie nicht.
+        </p>
+      </div>
+    </div>
+  </section>
+
   <!-- BEISPIEL-DIGEST (Stufe 1, statisch) -->
-  <section class="section fade">
+  <section class="section section-quiet fade">
     <div class="wrap narrow">
       <h2 class="section-title">Was Sie nach jedem Anruf bekommen</h2>
       <p class="lead" style="max-width:720px;">
@@ -518,7 +846,7 @@
   </section>
 
   <!-- AUTOMATISCHE KETTE + WOCHEN-BERICHT -->
-  <section class="section section-quiet fade">
+  <section class="section fade">
     <div class="wrap narrow">
       <h2 class="section-title">Was danach automatisch passiert</h2>
       <p class="lead" style="max-width:720px;">
@@ -567,164 +895,6 @@
 
         <p style="margin:1.3rem 0 0; padding-top:1rem; border-top:1px solid var(--line); font-size:.92rem; color:var(--muted);">
           Die Zahlen stammen im echten Betrieb direkt aus dem Anruf-Protokoll — nichts wird geschätzt oder geschönt.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- COCKPIT (Proof: eigene Übersichtsseite) -->
-  <style>
-    /* Die Vorschau läuft bewusst in den Farben eines Musterbetriebs (Navy/Gold),
-       nicht in denen dieser Seite — genau das ist die Aussage „in Ihren Farben". */
-    .cockpit {
-      --c-brand:#1e3f63; --c-brand-deep:#14293f; --c-soft:#e4ebf3;
-      --c-s1:#3b7fc4; --c-s2:#b8862b; --c-track:#dbe6f2;
-      --c-card:#fff; --c-ink:#131820; --c-muted:#5c6773; --c-line:#e6eaf0;
-      max-width:760px; margin-top:1.75rem; border-radius:14px; overflow:hidden;
-      border:1px solid var(--line); background:var(--c-card);
-      box-shadow:0 1px 2px rgba(20,30,45,.05), 0 18px 40px -22px rgba(20,30,45,.35);
-      font-family:"Inter",system-ui,sans-serif; color:var(--c-ink);
-    }
-    .cockpit-band {
-      background:linear-gradient(140deg,var(--c-brand) 0%,var(--c-brand-deep) 100%);
-      color:#fff; padding:1.1rem 1.3rem 1.35rem;
-    }
-    .cockpit-band .row { display:flex; align-items:center; gap:.65rem; flex-wrap:wrap; }
-    .cockpit-band .dot {
-      width:30px; height:30px; border-radius:8px; flex-shrink:0; display:grid; place-items:center;
-      background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.25);
-      font-weight:600; font-size:.78rem; color:#fff;
-    }
-    .cockpit-band .nm { font-weight:600; font-size:.95rem; }
-    .cockpit-band .nm small { display:block; font-size:.6rem; letter-spacing:.13em; text-transform:uppercase; color:rgba(255,255,255,.6); }
-    .cockpit-band .live { margin-left:auto; display:inline-flex; align-items:center; gap:.4rem; font-size:.75rem;
-      color:rgba(255,255,255,.85); background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18);
-      padding:.25rem .7rem; border-radius:999px; }
-    .cockpit-band .live i { width:6px; height:6px; border-radius:50%; background:#c8a24b; }
-    .cockpit-hero { margin-top:1.1rem; display:flex; align-items:flex-end; gap:.85rem; flex-wrap:wrap; }
-    .cockpit-hero .big { font-size:2.7rem; font-weight:600; line-height:.95; letter-spacing:-.03em; }
-    .cockpit-hero .lb { font-size:.85rem; color:rgba(255,255,255,.8); padding-bottom:.25rem; }
-    .cockpit-hero .dl { font-size:.72rem; font-weight:600; background:rgba(255,255,255,.12);
-      border:1px solid rgba(255,255,255,.18); padding:.15rem .55rem; border-radius:999px; margin-bottom:.3rem; }
-
-    .cockpit-body { padding:1.3rem 1.4rem 1.4rem; display:grid; gap:1.4rem; }
-    .cockpit-split2 { display:grid; gap:1.4rem; }
-    @media (min-width:640px) { .cockpit-split2 { grid-template-columns:auto 1fr; gap:1.9rem; align-items:center; } }
-    .cockpit h4 { font-size:.72rem; letter-spacing:.05em; text-transform:uppercase; color:var(--c-muted);
-      margin-bottom:.75rem; font-weight:600; font-family:"Inter",sans-serif; }
-    .cockpit .facts { font-size:.87rem; line-height:1.85; color:var(--c-muted); }
-    .cockpit .facts strong { color:var(--c-ink); float:right; }
-    .cockpit .sw { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:.45rem; }
-    .cockpit .meter { position:relative; width:104px; height:104px; }
-    .cockpit .meter .ctr { position:absolute; inset:0; display:grid; place-items:center; text-align:center; }
-    .cockpit .meter b { display:block; font-size:1.22rem; font-weight:600; line-height:1.1; }
-    .cockpit .meter span { display:block; font-size:.56rem; color:var(--c-muted); line-height:1.2; margin-top:1px; }
-    /* 2px Lücke in der Flächenfarbe trennt die Segmente — kein Rahmen */
-    .cockpit .bar { display:flex; gap:2px; height:38px; }
-    .cockpit .bar div { display:flex; align-items:center; padding:0 .75rem; color:#fff; font-weight:600; font-size:.85rem; }
-    .cockpit .bar div:first-child { background:var(--c-s1); border-radius:9px 3px 3px 9px; }
-    .cockpit .bar div:last-child  { background:var(--c-s2); border-radius:3px 9px 9px 3px; }
-    .cockpit .barleg { display:flex; flex-wrap:wrap; gap:.3rem 1.4rem; margin-top:.7rem; font-size:.82rem; color:var(--c-muted); }
-    .cockpit .sep { border-top:1px solid var(--c-line); }
-    .cockpit-cap { padding:1.1rem 1.4rem 1.3rem; border-top:1px solid var(--c-line); font-size:.9rem; color:var(--c-muted); background:#fbfcfd; }
-  </style>
-
-  <section class="section fade">
-    <div class="wrap narrow">
-      <h2 class="section-title">Und alles an einem Ort: Ihr Cockpit</h2>
-      <p class="lead" style="max-width:720px;">
-        Den Wochen-Bericht, jede Zusammenfassung und jeden einzelnen Anruf sehen Sie jederzeit
-        auch live — auf einer geschützten Übersichtsseite nur für Ihren Betrieb, in Ihren Farben.
-        Kein Login, kein Passwort: ein Lesezeichen genügt.
-      </p>
-
-      <div class="cockpit">
-        <div class="cockpit-band">
-          <div class="row">
-            <span class="dot">HH</span>
-            <span class="nm">Heimstein Hausverwaltung<small>Telefonassistent</small></span>
-            <span class="live"><i></i> Live &middot; 7 Tage</span>
-          </div>
-          <div class="cockpit-hero">
-            <span class="big">23</span>
-            <span class="lb">Anrufe angenommen</span>
-            <span class="dl">&uarr; +5 vs. Vorwoche</span>
-          </div>
-        </div>
-
-        <div class="cockpit-body">
-          <div class="cockpit-split2">
-            <div class="meter">
-              <svg viewBox="0 0 104 104" style="width:100%; height:100%; transform:rotate(-90deg);" aria-hidden="true">
-                <circle cx="52" cy="52" r="44" fill="none" stroke="var(--c-track)" stroke-width="11"/>
-                <circle cx="52" cy="52" r="44" fill="none" stroke="var(--c-s1)" stroke-width="11"
-                        stroke-linecap="round" stroke-dasharray="276.5" stroke-dashoffset="71.9"/>
-              </svg>
-              <div class="ctr"><div><b>74&thinsp;%</b><span>direkt erledigt</span></div></div>
-            </div>
-            <div>
-              <h4>Direkt erledigt</h4>
-              <div class="facts">
-                <div><span class="sw" style="background:var(--c-s1)"></span>Selbst beantwortet <strong>17</strong></div>
-                <div><span class="sw" style="background:var(--c-track)"></span>An Sie übergeben <strong>6</strong></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="sep"></div>
-
-          <div>
-            <h4>Erreichbarkeit rund um die Uhr</h4>
-            <div class="bar">
-              <div style="flex:9">9</div>
-              <div style="flex:14">14</div>
-            </div>
-            <div class="barleg">
-              <span><span class="sw" style="background:var(--c-s1)"></span>Außerhalb der Bürozeiten <strong style="color:var(--c-ink)">9</strong></span>
-              <span><span class="sw" style="background:var(--c-s2)"></span>Während der Bürozeiten <strong style="color:var(--c-ink)">14</strong></span>
-            </div>
-          </div>
-
-          <div class="sep"></div>
-
-          <div>
-            <h4>Anrufe pro Tag</h4>
-            <svg viewBox="0 0 640 160" style="width:100%; height:auto; display:block;" role="img" aria-label="Anrufe pro Tag: Montag 4, Dienstag 5, Mittwoch 3, Donnerstag 4, Freitag 3, Samstag 2, Sonntag 2">
-              <g font-family="Inter, sans-serif">
-                <line x1="30" y1="20"  x2="630" y2="20"  stroke="var(--c-line)" stroke-width="1"/>
-                <line x1="30" y1="66"  x2="630" y2="66"  stroke="var(--c-line)" stroke-width="1"/>
-                <line x1="30" y1="112" x2="630" y2="112" stroke="var(--c-line)" stroke-width="1"/>
-                <line x1="30" y1="130" x2="630" y2="130" stroke="#d3dae3" stroke-width="1"/>
-                <text x="22" y="24"  text-anchor="end" font-size="10" fill="#8a95a3">6</text>
-                <text x="22" y="70"  text-anchor="end" font-size="10" fill="#8a95a3">4</text>
-                <text x="22" y="116" text-anchor="end" font-size="10" fill="#8a95a3">2</text>
-                <text x="22" y="134" text-anchor="end" font-size="10" fill="#8a95a3">0</text>
-                <!-- Säulen: 24px, 4px Radius nur an der Kappe, Basis eckig -->
-                <path d="M63,130 V52 Q63,48 67,48 H83 Q87,48 87,52 V130 Z"     fill="var(--c-s1)"/>
-                <path d="M148,130 V29 Q148,25 152,25 H168 Q172,25 172,29 V130 Z" fill="var(--c-s1)"/>
-                <path d="M233,130 V75 Q233,71 237,71 H253 Q257,71 257,75 V130 Z" fill="var(--c-s1)"/>
-                <path d="M318,130 V52 Q318,48 322,48 H338 Q342,48 342,52 V130 Z" fill="var(--c-s1)"/>
-                <path d="M403,130 V75 Q403,71 407,71 H423 Q427,71 427,75 V130 Z" fill="var(--c-s1)"/>
-                <path d="M488,130 V98 Q488,94 492,94 H508 Q512,94 512,98 V130 Z" fill="var(--c-s1)"/>
-                <path d="M573,130 V98 Q573,94 577,94 H593 Q597,94 597,98 V130 Z" fill="var(--c-s1)"/>
-                <!-- Nur der Spitzenwert wird direkt beschriftet -->
-                <text x="160" y="18" text-anchor="middle" font-size="11" font-weight="600" fill="var(--c-ink)">5</text>
-                <text x="75"  y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">Mo</text>
-                <text x="160" y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">Di</text>
-                <text x="245" y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">Mi</text>
-                <text x="330" y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">Do</text>
-                <text x="415" y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">Fr</text>
-                <text x="500" y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">Sa</text>
-                <text x="585" y="150" text-anchor="middle" font-size="10.5" fill="#8a95a3">So</text>
-              </g>
-            </svg>
-          </div>
-        </div>
-
-        <p class="cockpit-cap">
-          So sieht das Cockpit für einen Musterbetrieb aus — Ihres zeigt Ihre echten Anrufe, in Ihren
-          Farben und mit Ihrem Namen. Darunter: die vollständige Liste aller Anrufe mit Zusammenfassung
-          und, wenn Sie mögen, dem Wortlaut.
         </p>
       </div>
     </div>
@@ -1015,6 +1185,259 @@
       });
     }, { threshold: 0.1 });
     document.querySelectorAll(".fade").forEach(function (el) { io.observe(el); });
+  })();
+
+  // ── DIREKTEINSTIEG PER #ANKER ──
+  // Beim Laden mit Hash steht das Ziel noch auf opacity:0 und der Sprung des
+  // Browsers verpufft. Also Ziel sichtbar schalten und selbst anspringen.
+  (function () {
+    function anspringen() {
+      if (!location.hash) return;
+      var ziel;
+      try { ziel = document.querySelector(location.hash); } catch (e) { return; }
+      if (!ziel) return;
+      ziel.classList.add("visible");
+      ziel.scrollIntoView({ behavior: "instant", block: "start" });
+    }
+    if (location.hash) {
+      // Sonst stellt der Browser beim Zurueck/Neuladen die alte Position wieder
+      // her — und zwar NACH unserem Sprung.
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+      anspringen();
+      window.addEventListener("load", anspringen);
+    }
+    window.addEventListener("hashchange", anspringen);
+  })();
+</script>
+
+<script>
+  // ── COCKPIT-DEMO: Beispieldaten des Musterbetriebs Heimstein ──────────────
+  // Kein Netzzugriff, kein Schluessel: die Zahlen stehen hier und sind erfunden.
+  // Ohne JS bleibt der 7-Tage-Stand sichtbar, der im HTML steht.
+  (function () {
+    var root = document.getElementById("cockpitDemo");
+    if (!root) return;
+
+    var DEMO = {
+      heute: {
+        label: "Heute", vgl: "\u2191 +1 vs. gestern",
+        calls: 4, direkt: 3, uebergeben: 1, ausserhalb: 1, innerhalb: 3,
+        titel: "Anrufe nach Tageszeit", kopf: "Uhrzeit",
+        labels: ["6\u201309", "9\u201312", "12\u201315", "15\u201318", "18\u201321", "21\u20136"],
+        werte:  [1, 0, 2, 1, 0, 0]
+      },
+      d7: {
+        label: "7 Tage", vgl: "\u2191 +5 vs. Vorwoche",
+        calls: 23, direkt: 17, uebergeben: 6, ausserhalb: 9, innerhalb: 14,
+        titel: "Anrufe pro Tag", kopf: "Tag",
+        labels: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"],
+        werte:  [4, 5, 3, 4, 3, 2, 2]
+      },
+      d30: {
+        label: "30 Tage", vgl: "\u2191 +12 vs. Vormonat",
+        calls: 94, direkt: 71, uebergeben: 23, ausserhalb: 38, innerhalb: 56,
+        titel: "Anrufe pro Woche", kopf: "Woche",
+        labels: ["KW 26", "KW 27", "KW 28", "KW 29"],
+        werte:  [21, 24, 26, 23]
+      }
+    };
+
+    var SVG_NS = "http://www.w3.org/2000/svg";
+
+    function alle(name) { return root.querySelectorAll('[data-ck="' + name + '"]'); }
+    function eins(name) { return root.querySelector('[data-ck="' + name + '"]'); }
+    function setze(name, wert) {
+      var els = alle(name);
+      for (var i = 0; i < els.length; i++) els[i].textContent = wert;
+    }
+
+    // Saeulen, Gitter und Achsen aus den Daten zeichnen.
+    // Skalenmaximum als Vielfaches von 3, damit die drei Gitterlinien ganze Zahlen tragen.
+    function zeichneSerie(d) {
+      var g = eins("serieG");
+      if (!g) return;
+      var max = Math.max.apply(null, d.werte);
+      var skala = Math.max(3, Math.ceil(max / 3) * 3);
+      var basis = 130, oben = 20, hoehe = basis - oben;
+      var n = d.werte.length, slot = 600 / n;
+      var breite = Math.min(24, slot * 0.28);
+      var teile = [];
+
+      function el(tag, attrs, text) {
+        var s = "<" + tag;
+        for (var k in attrs) s += " " + k + '="' + attrs[k] + '"';
+        s += ">" + (text === undefined ? "" : text) + "</" + tag + ">";
+        return s;
+      }
+
+      // Gitter: einfarbige Haarlinien, nie gestrichelt
+      for (var i = 0; i <= 3; i++) {
+        var wert = skala * (3 - i) / 3;
+        var y = oben + hoehe * i / 3;
+        teile.push(el("line", {
+          x1: 30, y1: y, x2: 630, y2: y,
+          stroke: i === 3 ? "#d3dae3" : "var(--c-line)", "stroke-width": 1
+        }));
+        teile.push(el("text", {
+          x: 22, y: y + 4, "text-anchor": "end", "font-size": 10, fill: "#8a95a3"
+        }, String(Math.round(wert))));
+      }
+
+      // Saeulen: 4px Radius nur an der Kappe, Basis eckig
+      var spitze = d.werte.indexOf(max);
+      for (var j = 0; j < n; j++) {
+        var v = d.werte[j];
+        var mitte = 30 + slot * (j + 0.5);
+        var x = mitte - breite / 2;
+        if (v > 0) {
+          var y0 = basis - hoehe * (v / skala);
+          var r = Math.min(4, (basis - y0) / 2);
+          teile.push(el("path", {
+            d: "M" + x.toFixed(1) + "," + basis +
+               " V" + (y0 + r).toFixed(1) +
+               " Q" + x.toFixed(1) + "," + y0.toFixed(1) + " " + (x + r).toFixed(1) + "," + y0.toFixed(1) +
+               " H" + (x + breite - r).toFixed(1) +
+               " Q" + (x + breite).toFixed(1) + "," + y0.toFixed(1) + " " + (x + breite).toFixed(1) + "," + (y0 + r).toFixed(1) +
+               " V" + basis + " Z",
+            fill: "var(--c-s1)"
+          }));
+          // Nur der Spitzenwert wird direkt beschriftet
+          if (j === spitze) {
+            teile.push(el("text", {
+              x: mitte.toFixed(1), y: (y0 - 7).toFixed(1), "text-anchor": "middle",
+              "font-size": 11, "font-weight": 600, fill: "var(--c-ink)"
+            }, String(v)));
+          }
+        }
+        teile.push(el("text", {
+          x: mitte.toFixed(1), y: 150, "text-anchor": "middle", "font-size": 10.5, fill: "#8a95a3"
+        }, d.labels[j]));
+      }
+
+      g.innerHTML = teile.join("");
+
+      var svg = eins("serieSvg");
+      if (svg) {
+        var paare = [];
+        for (var k = 0; k < n; k++) paare.push(d.labels[k] + " " + d.werte[k]);
+        svg.setAttribute("aria-label", d.titel + ": " + paare.join(", "));
+      }
+    }
+
+    function zeichneTabelle(d) {
+      var body = eins("serieBody");
+      if (!body) return;
+      var zeilen = "";
+      for (var i = 0; i < d.werte.length; i++) {
+        zeilen += "<tr><td>" + d.labels[i] + "</td><td>" + d.werte[i] + "</td></tr>";
+      }
+      body.innerHTML = zeilen;
+    }
+
+    function zeige(key) {
+      var d = DEMO[key];
+      if (!d) return;
+
+      setze("calls", d.calls);
+      setze("vgl", d.vgl);
+      setze("livelabel", "Live \u00b7 " + d.label);
+      setze("direkt", d.direkt);
+      setze("uebergeben", d.uebergeben);
+      setze("ausserhalb", d.ausserhalb);
+      setze("innerhalb", d.innerhalb);
+      setze("serieTitel", d.titel);
+      setze("serieKopf", d.kopf);
+
+      var quote = Math.round((d.direkt / d.calls) * 100);
+      setze("quote", quote + "\u2009%");
+
+      var ring = eins("meter");
+      if (ring) ring.setAttribute("stroke-dashoffset", (276.5 * (1 - quote / 100)).toFixed(1));
+
+      // Der Balken braucht in beiden Segmenten Platz fuer seine Zahl
+      var a = eins("ausserhalbBar"), b = eins("innerhalbBar");
+      if (a && b) {
+        a.style.flex = Math.max(d.ausserhalb, 1);
+        b.style.flex = Math.max(d.innerhalb, 1);
+        a.textContent = d.ausserhalb;
+        b.textContent = d.innerhalb;
+      }
+
+      zeichneSerie(d);
+      zeichneTabelle(d);
+
+      var knoepfe = root.querySelectorAll(".ck-range button");
+      for (var i = 0; i < knoepfe.length; i++) {
+        var an = knoepfe[i].getAttribute("data-range") === key;
+        knoepfe[i].classList.toggle("is-on", an);
+        knoepfe[i].setAttribute("aria-pressed", an ? "true" : "false");
+      }
+    }
+
+    // Zeitraum wechseln
+    var range = root.querySelector(".ck-range");
+    if (range) {
+      range.addEventListener("click", function (e) {
+        var btn = e.target.closest("button[data-range]");
+        if (btn) zeige(btn.getAttribute("data-range"));
+      });
+    }
+
+    // Tabellenansicht je Diagramm — kein Wert nur ueber einen Tooltip erreichbar
+    var tblKnoepfe = root.querySelectorAll(".ck-tbl");
+    for (var t = 0; t < tblKnoepfe.length; t++) {
+      tblKnoepfe[t].addEventListener("click", function () {
+        var ziel = document.getElementById(this.getAttribute("data-tbl"));
+        if (!ziel) return;
+        var offen = ziel.hidden;
+        ziel.hidden = !offen;
+        this.setAttribute("aria-expanded", offen ? "true" : "false");
+        this.textContent = offen ? "Diagramm" : "Tabelle";
+      });
+    }
+
+    // Rueckrufe abhaken
+    var todo = eins("todo");
+    if (todo) {
+      todo.addEventListener("click", function (e) {
+        var btn = e.target.closest("button");
+        if (!btn) return;
+        var li = btn.closest("li");
+        var erledigt = li.classList.toggle("is-done");
+        btn.textContent = erledigt ? "Offen" : "Erledigt";
+        var offen = todo.querySelectorAll("li:not(.is-done)").length;
+        setze("todoZahl", "(" + offen + ")");
+      });
+    }
+
+    // Vollbild — der Hintergrund wird stillgelegt, die Scrollposition gemerkt
+    var vollBtn = eins("fullBtn");
+    var merkScroll = 0;
+
+    function vollbild(an) {
+      if (an && !root.classList.contains("is-full")) merkScroll = window.scrollY;
+      root.classList.toggle("is-full", an);
+      document.body.classList.toggle("ck-offen", an);
+      setze("fullText", an ? "Schließen" : "Groß ansehen");
+      if (vollBtn) vollBtn.setAttribute("aria-expanded", an ? "true" : "false");
+      if (an) {
+        root.scrollTop = 0;
+        root.focus({ preventScroll: true });
+      } else {
+        window.scrollTo(0, merkScroll);
+      }
+    }
+
+    if (vollBtn) {
+      vollBtn.addEventListener("click", function () {
+        vollbild(!root.classList.contains("is-full"));
+      });
+    }
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && root.classList.contains("is-full")) vollbild(false);
+    });
+
+    zeige("d7");
   })();
 </script>
 
