@@ -1,0 +1,1274 @@
+<!--
+  ERZEUGT — NICHT VON HAND ÄNDERN.
+  Quelle: 06_content/kunden-dashboard/kunde.html
+  Neu bauen: python scripts/demo_seite_bauen.py
+  Alle Zahlen und Namen sind frei erfunden (Musterbetrieb Heimstein).
+-->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Beispiel-Cockpit · Telefonassistent</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet" />
+  <style>
+    /* ════════════════════════════════════════════════════════════════════════
+       BLUEPRINT — ein Template für alle Kunden.
+       Nichts Kundenspezifisches steht hier. Farben, Logo-Text, Initialen,
+       Claim und Schriftwahl kommen ausschließlich aus crm_dashboards.theme
+       und werden zur Laufzeit auf :root gesetzt. Die Werte unten sind nur
+       neutrale Rückfallwerte, damit die Seite auch ohne Theme trägt.
+
+       Diagrammfarben (--s1/--s2) sind gegen die sechs Checks des dataviz-
+       Regelwerks geprüft (Lightness-Band, Chroma-Floor, CVD-Trennung,
+       Kontrast) — in Hell UND Dunkel. Beim Anlegen eines neuen Kunden das
+       Serien-Paar erneut validieren, nicht schätzen. Siehe README.
+       ════════════════════════════════════════════════════════════════════════ */
+    :root {
+      --bg:          #f4f6f8;
+      --card:        #ffffff;
+      --ink:         #131820;
+      --muted:       #5c6773;
+      --faint:       #8a95a3;
+      --line:        #e6eaf0;
+      --line-strong: #d3dae3;
+
+      /* Chrome (Band, Buttons, Überschriften) — bewusst dunkler als jede Diagrammfarbe.
+         Die Rückfallwerte sind die HAUSFARBEN (wie die Landing-Page), nie die eines
+         Kunden — ein Betrieb ohne Theme darf nicht wie ein anderer Betrieb aussehen. */
+      --brand:       #1e6b52;
+      --brand-deep:  #12402f;
+      --brand-ink:   #ffffff;
+      --akzent:      #c8a24b;
+
+      /* Hell/Dunkel-Paare. Das Theme setzt NUR die *-hell/*-dunkel-Variablen per
+         Inline-Style; welche davon gilt, entscheidet allein die Media Query unten.
+         (Würde das Theme --s1 direkt setzen, schlüge es den Dunkelmodus tot.) */
+      --brand-soft-hell:   #d8ede5;
+      --brand-soft-dunkel: color-mix(in srgb, var(--brand) 34%, #0f141b);
+      --brand-soft:        var(--brand-soft-hell);
+
+      /* Diagramm-Serien — je Modus ein eigener, validierter Schritt */
+      --s1-hell:     #2f8f6b;
+      --s1-dunkel:   #3aa47e;
+      --s1:          var(--s1-hell);
+      --s2:          #b8862b;
+      --s1-track:    color-mix(in srgb, var(--s1) 16%, var(--card));
+
+      /* Status — reserviert, nie als Serienfarbe */
+      --good:        #1c7d5a;
+      --good-soft:   #dff1e8;
+      --warn:        #a5620f;
+      --warn-soft:   #f8ecd9;
+
+      --max:   1140px;
+      --r:     16px;
+      --r-sm:  11px;
+      --shadow:    0 1px 2px rgba(20,30,45,.05), 0 12px 32px -14px rgba(20,30,45,.18);
+      --shadow-sm: 0 1px 2px rgba(20,30,45,.05), 0 5px 16px -10px rgba(20,30,45,.14);
+      --head: "Space Grotesk", "Inter", system-ui, sans-serif;
+    }
+    :root[data-schrift="serif"] { --head: "Newsreader", Georgia, serif; }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:#0f141b; --card:#171e28; --ink:#e9eef5; --muted:#9aa6b4; --faint:#6c7a8a;
+        --line:#242e3a; --line-strong:#313d4c;
+        --brand-soft: var(--brand-soft-dunkel);
+        --s1: var(--s1-dunkel);     /* eigener, gegen die dunkle Fläche validierter Schritt */
+        --good:#3ba97e; --good-soft:#12291f;
+        --warn:#d08a34; --warn-soft:#2e2110;
+        --shadow:    0 1px 2px rgba(0,0,0,.4), 0 14px 36px -14px rgba(0,0,0,.55);
+        --shadow-sm: 0 1px 2px rgba(0,0,0,.35), 0 6px 18px -10px rgba(0,0,0,.45);
+      }
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    /* [hidden] muss auch gegen display:grid/flex gewinnen */
+    [hidden] { display: none !important; }
+    html { background: var(--bg); }
+    body {
+      background: var(--bg); color: var(--ink);
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+    }
+    h1, h2, h3 { font-family: var(--head); letter-spacing: -0.012em; font-weight: 600; }
+    /* tabular-nums NUR in Spalten (Tabellen, Achsen) — nie auf großen Einzelzahlen */
+    .tnum { font-variant-numeric: tabular-nums; }
+    .wrap { max-width: var(--max); margin: 0 auto; padding-inline: 1.25rem; }
+
+    /* ── MARKEN-BAND ─────────────────────────────────────────────────────── */
+    .topband {
+      position: relative; overflow: hidden; color: var(--brand-ink);
+      background:
+        radial-gradient(115% 130% at 100% -20%, color-mix(in srgb, var(--brand) 62%, #fff) 0%, transparent 48%),
+        linear-gradient(140deg, var(--brand) 0%, var(--brand-deep) 100%);
+      padding: 1.4rem 0 3.2rem;
+    }
+    .topband::after {
+      content: ""; position: absolute; right: -70px; bottom: -120px; width: 340px; height: 340px;
+      border-radius: 50%; background: rgba(255,255,255,.05); pointer-events: none;
+    }
+    .topband .wrap { position: relative; z-index: 1; }
+    header.top { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; }
+    .brandmark { display: flex; align-items: center; gap: .75rem; min-width: 0; }
+    .brand-dot {
+      width: 40px; height: 40px; border-radius: 11px; flex-shrink: 0; display: grid; place-items: center;
+      background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.24);
+      color: #fff; font-family: var(--head); font-weight: 600; font-size: .95rem; letter-spacing: .02em;
+    }
+    .logo { font-family: var(--head); font-size: 1.12rem; font-weight: 600; color: #fff; line-height: 1.2; }
+    .logo small {
+      display: block; font-family: "Inter", sans-serif; font-weight: 500; font-size: .68rem;
+      letter-spacing: .13em; text-transform: uppercase; color: rgba(255,255,255,.65); margin-top: 3px;
+    }
+    .live {
+      display: inline-flex; align-items: center; gap: .45rem; font-size: .8rem; color: rgba(255,255,255,.85);
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18);
+      padding: .35rem .85rem; border-radius: 999px;
+    }
+    .live i { width: 7px; height: 7px; border-radius: 50%; background: var(--akzent); animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+    .band-head { margin-top: 2rem; display: flex; flex-wrap: wrap; gap: 2rem 3rem; align-items: flex-end; justify-content: space-between; }
+    h1 { font-size: clamp(1.5rem, 3vw, 2rem); color: #fff; margin-bottom: .35rem; }
+    .sub { color: rgba(255,255,255,.75); font-size: .95rem; max-width: 44ch; }
+
+    /* Hero: die eine Zahl, mit der die Seite führt. Sans, proportionale Ziffern. */
+    .hero .value {
+      font-family: "Inter", sans-serif; font-weight: 600; font-size: clamp(3rem, 8vw, 4.2rem);
+      line-height: .92; color: #fff; letter-spacing: -0.03em;
+    }
+    .hero .label { font-size: 1rem; font-weight: 500; color: #fff; margin-top: .55rem; }
+    .hero .delta { display: inline-flex; align-items: center; gap: .35rem; margin-top: .5rem;
+      font-size: .82rem; font-weight: 500; color: rgba(255,255,255,.85);
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.16);
+      padding: .22rem .65rem; border-radius: 999px; }
+    .hero .delta svg { width: 13px; height: 13px; }
+
+    /* Eine Filterzeile über allem, was sie steuert */
+    .ranges {
+      display: inline-flex; gap: 3px; margin-top: 1.5rem; background: rgba(255,255,255,.11);
+      padding: 4px; border-radius: 999px; border: 1px solid rgba(255,255,255,.18);
+    }
+    .ranges button {
+      font: inherit; font-size: .85rem; font-weight: 500; padding: .36rem 1.05rem; border-radius: 999px;
+      border: none; background: transparent; color: rgba(255,255,255,.8); cursor: pointer; transition: .15s;
+    }
+    .ranges button:hover { color: #fff; }
+    .ranges button[aria-pressed="true"] { background: #fff; color: var(--brand); }
+    .ranges button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+    /* ── HAUPTBEREICH ────────────────────────────────────────────────────── */
+    .main-wrap { padding-bottom: 4.5rem; margin-top: -2rem; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); }
+    /* Kein Skeleton-Flash beim Nachladen: vorheriges Bild gedimmt halten */
+    #app.busy { opacity: .55; transition: opacity .12s; }
+
+    .kpi { display: grid; grid-template-columns: repeat(auto-fit, minmax(196px, 1fr)); gap: .85rem; position: relative; z-index: 2; }
+    .kpi .k {
+      background: var(--card); border: 1px solid var(--line); border-radius: var(--r-sm);
+      box-shadow: var(--shadow-sm); padding: 1.1rem 1.2rem 1.15rem;
+    }
+    .kpi .k .ico { width: 32px; height: 32px; border-radius: 9px; background: var(--brand-soft); color: var(--brand);
+      display: grid; place-items: center; margin-bottom: .8rem; }
+    @media (prefers-color-scheme: dark) { .kpi .k .ico { color: #cfe0f2; } }
+    .kpi .k .ico svg { width: 17px; height: 17px; }
+    .kpi .k .kv { font-weight: 600; font-size: 1.65rem; line-height: 1.15; letter-spacing: -0.02em; color: var(--ink); }
+    .kpi .k .kl { font-size: .84rem; font-weight: 500; color: var(--muted); margin-top: .35rem; }
+    .kpi .k .kh { font-size: .77rem; color: var(--faint); margin-top: .15rem; }
+    .chip { display: inline-flex; align-items: center; gap: .3rem; font-size: .74rem; font-weight: 600;
+      padding: .12rem .5rem; border-radius: 999px; margin-top: .5rem; }
+    .chip svg { width: 12px; height: 12px; }
+    .chip.up   { background: var(--good-soft); color: var(--good); }
+    .chip.down { background: var(--warn-soft); color: var(--warn); }
+    .chip.flat { background: var(--line); color: var(--muted); }
+
+    /* ── DIAGRAMM-KARTEN ─────────────────────────────────────────────────── */
+    .charts { display: grid; grid-template-columns: 1fr; gap: .95rem; margin-top: .95rem; }
+    @media (min-width: 820px) { .charts { grid-template-columns: 1fr 1fr; } .charts .span { grid-column: 1 / -1; } }
+    .chart-card { padding: 1.35rem 1.45rem 1.5rem; position: relative; display: flex; flex-direction: column; }
+    .chart-card header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+    /* Das Meter sitzt mittig in seiner Karte, statt oben zu kleben */
+    #meterCard .meter-wrap { margin-block: auto; }
+    .chart-card h2 { font-size: 1rem; display: flex; align-items: center; gap: .55rem; }
+    .chart-card h2::before { content: ""; width: 3px; height: 16px; border-radius: 3px; background: var(--s1); flex-shrink: 0; }
+    .chart-card .cap { font-size: .84rem; color: var(--muted); margin: .35rem 0 1.25rem; }
+
+    .tv-toggle {
+      font: inherit; font-size: .75rem; font-weight: 500; color: var(--muted); cursor: pointer;
+      background: transparent; border: 1px solid var(--line-strong); border-radius: 7px; padding: .22rem .6rem; transition: .15s;
+    }
+    .tv-toggle:hover { color: var(--ink); border-color: var(--faint); }
+    .tv-toggle[aria-pressed="true"] { background: var(--brand-soft); color: var(--brand); border-color: transparent; }
+    @media (prefers-color-scheme: dark) { .tv-toggle[aria-pressed="true"] { color: #cfe0f2; } }
+
+    /* Datentabelle — das WCAG-saubere Zwilling jedes Diagramms */
+    table.tv { width: 100%; border-collapse: collapse; font-size: .86rem; }
+    table.tv th, table.tv td { text-align: left; padding: .42rem .6rem; border-bottom: 1px solid var(--line); }
+    table.tv th { font-weight: 600; color: var(--muted); font-size: .76rem; text-transform: uppercase; letter-spacing: .05em; }
+    table.tv td.num, table.tv th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    .tv-scroll { max-height: 260px; overflow-y: auto; }
+
+    /* SVG-Grundformen */
+    svg.chart { width: 100%; height: auto; display: block; overflow: visible; }
+    svg.chart .grid { stroke: var(--line); stroke-width: 1; }          /* hairline, solid, recessive */
+    svg.chart .axis { stroke: var(--line-strong); stroke-width: 1; }
+    svg.chart text { font-family: "Inter", sans-serif; }
+    svg.chart text.tick { fill: var(--faint); font-size: 11px; font-variant-numeric: tabular-nums; }
+    svg.chart text.val  { fill: var(--ink); font-size: 12px; font-weight: 600; }
+    svg.chart .hit { fill: transparent; cursor: default; }
+    svg.chart .col { fill: var(--s1); transition: opacity .12s; }
+    svg.chart .col.zero { fill: var(--line-strong); }
+    svg.chart g.band:hover .col { opacity: .78; }
+    svg.chart .area { fill: var(--s1); opacity: .1; }
+    svg.chart .line { fill: none; stroke: var(--s1); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+    svg.chart .enddot { fill: var(--s1); stroke: var(--card); stroke-width: 2; }  /* 2px Fläche-Ring */
+
+    /* Tooltip — ergänzt, ersetzt nie: jeder Wert steht auch in der Tabellenansicht */
+    #tip {
+      position: fixed; z-index: 50; pointer-events: none; opacity: 0; transition: opacity .1s;
+      background: var(--ink); color: var(--bg); font-size: .8rem; line-height: 1.45;
+      padding: .45rem .65rem; border-radius: 8px; box-shadow: 0 6px 20px -6px rgba(0,0,0,.4); max-width: 220px;
+    }
+    #tip b { font-weight: 600; }
+    #tip.on { opacity: 1; }
+
+    /* Meter: eine Zahl, kein Zwei-Segment-Kuchen. Track = heller Schritt derselben Rampe. */
+    .meter-wrap { display: flex; align-items: center; gap: 1.6rem; flex-wrap: wrap; }
+    .meter { position: relative; width: 138px; height: 138px; flex-shrink: 0; }
+    .meter svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .meter .center { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+    .meter .center b { display: block; font-weight: 600; font-size: 1.8rem; line-height: 1.1; letter-spacing: -0.02em; color: var(--ink); }
+    .meter .center span { display: block; font-size: .68rem; color: var(--faint); margin-top: 2px; max-width: 84px; line-height: 1.3; }
+    .meter-facts { display: flex; flex-direction: column; gap: .75rem; min-width: 160px; flex: 1 1 160px; }
+    .meter-facts .row { display: flex; align-items: baseline; gap: .6rem; font-size: .9rem; color: var(--muted); }
+    .meter-facts .row b { margin-left: auto; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); }
+    .meter-facts .sw { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; align-self: center; }
+
+    /* Gestapelter Balken: 2px Fläche-Lücke trennt, kein Rahmen */
+    .split { display: flex; gap: 2px; height: 46px; }
+    .split .seg { display: flex; align-items: center; padding: 0 .85rem; color: #fff; font-weight: 600; font-size: .92rem;
+      font-variant-numeric: tabular-nums; min-width: 6px; overflow: visible; white-space: nowrap; }
+    .split .seg:first-child { border-radius: 10px 4px 4px 10px; }
+    .split .seg:last-child  { border-radius: 4px 10px 10px 4px; }
+    .split .seg:only-child  { border-radius: 10px; }
+    .split .seg.a { background: var(--s1); }
+    .split .seg.b { background: var(--s2); }
+    .split-legend { display: flex; flex-wrap: wrap; gap: .45rem 1.6rem; margin-top: 1rem; font-size: .88rem; }
+    .split-legend .row { display: flex; align-items: center; gap: .5rem; color: var(--muted); }
+    .split-legend .sw { width: 11px; height: 11px; border-radius: 3px; }
+    .split-legend b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+    .insight {
+      margin-top: 1.1rem; padding: .8rem .95rem; background: var(--brand-soft); border-radius: var(--r-sm);
+      font-size: .87rem; color: var(--ink); display: flex; gap: .55rem; align-items: flex-start;
+    }
+    .insight svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 3px; color: var(--brand); }
+    @media (prefers-color-scheme: dark) { .insight svg { color: #8fb6dd; } }
+
+    /* ── ABSCHNITTE ──────────────────────────────────────────────────────── */
+    section.block { margin-top: 2.5rem; }
+    section.block > h2 { font-size: 1.18rem; margin-bottom: .95rem; display: flex; align-items: center; gap: .6rem; }
+    section.block > h2 .count {
+      font-family: "Inter", sans-serif; font-size: .74rem; font-weight: 600; color: var(--warn);
+      background: var(--warn-soft); padding: .14rem .6rem; border-radius: 999px; letter-spacing: 0;
+    }
+    ul.rueckrufe { list-style: none; display: grid; gap: .6rem; }
+    ul.rueckrufe li {
+      background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--warn);
+      border-radius: var(--r-sm); overflow: hidden; box-shadow: var(--shadow-sm);
+    }
+    ul.rueckrufe summary {
+      list-style: none; cursor: pointer; padding: .9rem 1.1rem;
+      display: flex; flex-wrap: wrap; gap: .3rem 1rem; align-items: center;
+    }
+    ul.rueckrufe summary::-webkit-details-marker { display: none; }
+    ul.rueckrufe summary:hover { background: color-mix(in srgb, var(--warn) 5%, var(--card)); }
+    ul.rueckrufe .wer { font-weight: 600; }
+    ul.rueckrufe .num { color: var(--muted); font-size: .87rem; font-variant-numeric: tabular-nums; }
+    ul.rueckrufe .was { color: var(--muted); flex: 1 1 220px; }
+    ul.rueckrufe button {
+      font: inherit; font-size: .83rem; font-weight: 600; padding: .44rem .9rem; border-radius: 8px; cursor: pointer;
+      border: none; background: var(--brand); color: #fff; transition: .15s;
+    }
+    ul.rueckrufe button:hover { filter: brightness(1.15); }
+    ul.rueckrufe button:disabled { opacity: .6; cursor: wait; }
+
+    /* Sichtbarer Auslöser: ohne ihn ahnt niemand, dass sich die Zeile öffnen lässt. */
+    .mehr {
+      font-size: .78rem; font-weight: 600; color: var(--brand);
+      display: inline-flex; align-items: center; gap: .32rem; white-space: nowrap;
+    }
+    /* Nur prefers-color-scheme — diese Seite hat keinen data-theme-Umschalter.
+       Eine data-theme-Regel würde die Farbe umstellen, während die Flächen hell
+       bleiben (gemessen: Kontrast 1.8:1). */
+    @media (prefers-color-scheme: dark) { .mehr { color: #9dc4ea; } }
+    .mehr::after {
+      content: ""; width: .48rem; height: .48rem; border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor; transform: translateY(-2px) rotate(45deg);
+      transition: transform .15s;
+    }
+    details[open] > summary .mehr::after { transform: translateY(1px) rotate(225deg); }
+    details[open] > summary .mehr .auf { display: none; }
+    .mehr .zu { display: none; }
+    details[open] > summary .mehr .zu { display: inline; }
+    .leer-hinweis {
+      color: var(--muted); background: var(--card); border: 1px dashed var(--line-strong);
+      border-radius: var(--r-sm); padding: 1.05rem 1.15rem;
+    }
+
+    .calls details {
+      background: var(--card); border: 1px solid var(--line); border-radius: var(--r-sm);
+      margin-bottom: .5rem; overflow: hidden; box-shadow: var(--shadow-sm);
+    }
+    .calls summary {
+      list-style: none; cursor: pointer; padding: .85rem 1.1rem;
+      display: grid; grid-template-columns: 8.5rem 1fr auto auto auto; gap: .5rem 1rem; align-items: center;
+    }
+    .calls summary::-webkit-details-marker { display: none; }
+    .calls summary:hover { background: color-mix(in srgb, var(--s1) 5%, var(--card)); }
+    .calls .zeit, .calls .dauer { color: var(--faint); font-size: .82rem; font-variant-numeric: tabular-nums; }
+    .calls .wer { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .calls .wer .anl { font-weight: 400; color: var(--muted); }
+    .badge { font-size: .73rem; font-weight: 600; padding: .2rem .62rem; border-radius: 999px; white-space: nowrap; }
+    .badge.selbst   { background: var(--brand-soft); color: var(--brand); }
+    .badge.offen    { background: var(--warn-soft); color: var(--warn); }
+    .badge.erledigt { background: var(--line); color: var(--muted); }
+    @media (prefers-color-scheme: dark) { .badge.selbst { color: #cfe0f2; } }
+    .calls .detail, ul.rueckrufe .detail {
+      border-top: 1px solid var(--line); padding: .95rem 1.1rem 1.15rem; display: grid; gap: .85rem;
+    }
+    .calls .detail h3, ul.rueckrufe .detail h3 {
+      font-family: "Inter", sans-serif; font-size: .72rem; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--faint); font-weight: 600; margin-bottom: .3rem;
+    }
+    .calls .transkript, ul.rueckrufe .transkript {
+      white-space: pre-wrap; font-size: .89rem; background: var(--bg); border: 1px solid var(--line);
+      border-radius: 9px; padding: .85rem 1rem; max-height: 320px; overflow-y: auto;
+    }
+    .calls .detail .kh, ul.rueckrufe .detail .kh {
+      font-size: .8rem; color: var(--faint); font-variant-numeric: tabular-nums;
+    }
+    /* Die Zusammenfassung ist das, was der Inhaber liest — sie steht vor dem Verlauf
+       und wird optisch als Aussage gesetzt, nicht als Fließtext unter vielen. */
+    .calls .detail .fazit, ul.rueckrufe .detail .fazit {
+      font-size: .97rem; line-height: 1.55; background: var(--brand-soft);
+      border-radius: 9px; padding: .8rem 1rem;
+    }
+    @media (max-width: 640px) {
+      /* Drei Spalten, nicht zwei: sichtbar bleiben wer + badge + "Mehr Infos".
+         Bei zwei Spalten bricht der Auslöser in eine zweite Zeile um. */
+      .calls summary { grid-template-columns: 1fr auto auto; gap: .5rem .6rem; }
+      .calls .zeit, .calls .dauer { display: none; }
+      ul.rueckrufe summary { gap: .3rem .6rem; }
+    }
+
+    footer {
+      margin-top: 3.5rem; color: var(--faint); font-size: .83rem; border-top: 1px solid var(--line);
+      padding-top: 1.2rem; display: flex; flex-wrap: wrap; gap: .4rem 1rem; justify-content: space-between;
+    }
+    footer button.abmelden {
+      font: inherit; font-size: .83rem; color: var(--faint); background: none; border: none;
+      padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+    }
+    footer button.abmelden:hover { color: var(--ink); }
+    #status { margin: 3rem 0; }
+
+    /* ── ZUGANG ──────────────────────────────────────────────────────────
+       Der Schlüssel wird einmal eingetragen und auf dem Gerät gemerkt.
+       Danach genügt die kurze URL — der Schlüssel steht nicht mehr in der
+       Adresszeile, im Verlauf oder in weitergeleiteten Screenshots.        */
+    .gate { max-width: 430px; margin: 3.5rem auto 4rem; padding: 2rem 1.9rem 1.9rem; text-align: left; }
+    .gate .schloss {
+      width: 42px; height: 42px; border-radius: 12px; background: var(--brand-soft); color: var(--brand);
+      display: grid; place-items: center; margin-bottom: 1.15rem;
+    }
+    @media (prefers-color-scheme: dark) { .gate .schloss { color: #cfe0f2; } }
+    .gate .schloss svg { width: 20px; height: 20px; }
+    .gate h2 { font-size: 1.25rem; margin-bottom: .45rem; }
+    .gate p { color: var(--muted); font-size: .9rem; margin-bottom: 1.4rem; }
+    .gate label { display: block; font-size: .81rem; font-weight: 600; color: var(--muted); margin-bottom: .4rem; }
+    .gate .feld { display: flex; gap: .5rem; }
+    .gate input[type="text"], .gate input[type="password"] {
+      flex: 1; min-width: 0; font: inherit; font-size: .95rem; letter-spacing: .02em;
+      padding: .7rem .85rem; border-radius: 10px; border: 1px solid var(--line-strong);
+      background: var(--bg); color: var(--ink); transition: border-color .15s, box-shadow .15s;
+    }
+    .gate input:focus {
+      outline: none; border-color: var(--brand);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent);
+    }
+    .gate .zeigen {
+      font: inherit; font-size: .8rem; font-weight: 500; color: var(--muted); cursor: pointer;
+      background: transparent; border: 1px solid var(--line-strong); border-radius: 10px; padding: 0 .8rem;
+    }
+    .gate .zeigen:hover { color: var(--ink); }
+    .gate .merken { display: flex; align-items: center; gap: .5rem; margin-top: .95rem; font-size: .86rem; color: var(--muted); }
+    .gate .merken input { accent-color: var(--brand); width: 16px; height: 16px; }
+    .gate button.los {
+      width: 100%; margin-top: 1.3rem; font: inherit; font-size: .95rem; font-weight: 600;
+      padding: .75rem 1rem; border-radius: 10px; border: none; cursor: pointer;
+      background: var(--brand); color: #fff; transition: filter .15s;
+    }
+    .gate button.los:hover { filter: brightness(1.15); }
+    .gate button.los:disabled { opacity: .6; cursor: wait; }
+    .gate .fehler {
+      display: flex; gap: .5rem; align-items: flex-start; margin-top: 1.1rem; padding: .7rem .85rem;
+      background: var(--warn-soft); color: var(--warn); border-radius: 10px; font-size: .85rem;
+    }
+    .gate .fehler svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; }
+    .gate .hinweis { margin: 1.4rem 0 0; padding-top: 1.1rem; border-top: 1px solid var(--line);
+      font-size: .8rem; color: var(--faint); }
+
+    @media (prefers-reduced-motion: reduce) { *, ::before, ::after { transition: none !important; animation: none !important; } }
+    @media print { .topband { background: none; color: #000; } .tv-toggle, .ranges, #tip { display: none; } }
+  </style>
+</head>
+<body>
+
+  <div class="topband" id="topband">
+    <div class="wrap">
+      <header class="top">
+        <div class="brandmark">
+          <div class="brand-dot" id="brandDot">·</div>
+          <div class="logo" id="logo">Übersicht<small>Telefonassistent</small></div>
+        </div>
+        <span class="live" id="liveTag" hidden><i></i> Live aus Ihrem Anruf-Protokoll</span>
+      </header>
+
+      <div class="band-head">
+        <div>
+          <h1 id="ueberschrift">Ihr Telefonassistent im Blick</h1>
+          <div class="sub" id="untertitel">Alle Anrufe, Zusammenfassungen und Rückrufe an einem Ort — direkt aus dem Protokoll.</div>
+          <div class="ranges" role="group" aria-label="Zeitraum" id="ranges" hidden>
+            <button data-range="heute" aria-pressed="true">Heute</button>
+            <button data-range="7" aria-pressed="false">7 Tage</button>
+            <button data-range="30" aria-pressed="false">30 Tage</button>
+          </div>
+        </div>
+
+        <div class="hero" id="heroRow" hidden>
+          <div class="value" id="heroVal">0</div>
+          <div class="label">Anrufe angenommen</div>
+          <div id="heroDelta"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap main-wrap">
+    <div id="status" class="leer-hinweis" hidden></div>
+
+    <form class="card gate" id="gate" hidden autocomplete="off">
+      <div class="schloss" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="10" width="16" height="11" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+        </svg>
+      </div>
+      <h2>Ihre Übersicht öffnen</h2>
+      <p>Tragen Sie einmalig Ihren Zugangsschlüssel ein. Wir merken ihn uns auf diesem Gerät —
+         beim nächsten Mal sind Sie direkt drin.</p>
+
+      <label for="keyFeld">Zugangsschlüssel</label>
+      <div class="feld">
+        <input type="password" id="keyFeld" name="zugangsschluessel" inputmode="latin"
+               autocomplete="off" autocapitalize="off" spellcheck="false"
+               placeholder="Ihr Schlüssel aus unserer Mail" aria-describedby="gateFehler" />
+        <button type="button" class="zeigen" id="zeigenBtn" aria-pressed="false">Zeigen</button>
+      </div>
+
+      <label class="merken">
+        <input type="checkbox" id="merkenBox" checked />
+        Auf diesem Gerät angemeldet bleiben
+      </label>
+
+      <button type="submit" class="los" id="losBtn">Übersicht öffnen</button>
+
+      <div class="fehler" id="gateFehler" role="alert" hidden></div>
+
+      <p class="hinweis">Den Schlüssel haben Sie von uns erhalten. Er ersetzt Passwort und Login —
+         bitte geben Sie ihn nicht weiter.</p>
+    </form>
+
+    <main id="app" hidden>
+      <div class="kpi" id="kpi"></div>
+
+      <div class="charts" id="charts">
+        <div class="card chart-card" id="meterCard">
+          <header><h2>Direkt erledigt</h2></header>
+          <div class="cap">Anteil der Anrufe, die der Assistent ohne Sie abgeschlossen hat.</div>
+          <div class="meter-wrap">
+            <div class="meter" id="meter"></div>
+            <div class="meter-facts" id="meterFacts"></div>
+          </div>
+        </div>
+
+        <div class="card chart-card" id="reachCard">
+          <header><h2>Erreichbarkeit rund um die Uhr</h2></header>
+          <div class="cap">Anrufe außerhalb vs. innerhalb der Bürozeiten (Mo–Fr 8–18 Uhr).</div>
+          <div class="split" id="split"></div>
+          <div class="split-legend" id="splitLegend"></div>
+          <div class="insight" id="reachInsight" hidden></div>
+        </div>
+
+        <div class="card chart-card span" id="trendCard">
+          <header>
+            <div>
+              <h2 id="trendTitle">Anrufe pro Tag</h2>
+              <div class="cap" id="trendCap">So verteilen sich die Anrufe über den Zeitraum.</div>
+            </div>
+            <button class="tv-toggle" id="trendTv" aria-pressed="false">Tabelle</button>
+          </header>
+          <div id="trend"></div>
+        </div>
+
+        <div class="card chart-card span" id="zeitCard">
+          <header>
+            <div>
+              <h2>Abgenommene Gesprächszeit</h2>
+              <div class="cap" id="zeitCap">Wie sich die Minuten summieren, die niemand bei Ihnen am Telefon verbringen musste.</div>
+            </div>
+            <button class="tv-toggle" id="zeitTv" aria-pressed="false">Tabelle</button>
+          </header>
+          <div id="zeit"></div>
+        </div>
+      </div>
+
+      <div class="leer-hinweis" id="charts-leer" hidden></div>
+
+      <section class="block">
+        <h2>Rückrufe für Sie <span class="count" id="rr-anzahl" hidden></span></h2>
+        <ul class="rueckrufe" id="rueckrufe"></ul>
+        <div class="leer-hinweis" id="rr-leer" hidden>Nichts offen — alle Anliegen sind erledigt oder wurden direkt beantwortet.</div>
+      </section>
+
+      <section class="block">
+        <h2>Alle Anrufe im Zeitraum</h2>
+        <div class="calls" id="calls"></div>
+        <div class="leer-hinweis" id="calls-leer" hidden>Im gewählten Zeitraum gab es keine Anrufe.</div>
+      </section>
+
+      <footer>
+        <span>Aktualisiert sich bei jedem Aufruf.</span>
+        <span id="footClaim">Fragen? Einfach anrufen oder mailen — Simon Brändle.</span>
+        <button type="button" class="abmelden" id="abmeldenBtn" hidden>Von diesem Gerät abmelden</button>
+      </footer>
+    </main>
+  </div>
+
+  <div id="tip" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var pfad = location.pathname.match(/\/kunde\/([a-z0-9-]+)/i);
+      var params = new URLSearchParams(location.search);
+      var slug = "demo";  // Demo-Seite: kein Zugangslink nötig
+      var admin = params.get("admin") || "";
+      var range = "heute";
+
+      var statusEl = document.getElementById("status");
+      var app = document.getElementById("app");
+      var tip = document.getElementById("tip");
+      var gate = document.getElementById("gate");
+      var keyFeld = document.getElementById("keyFeld");
+      var gateFehler = document.getElementById("gateFehler");
+
+      function zeige(text) { statusEl.hidden = false; statusEl.textContent = text; }
+
+      /* ── Schlüssel-Ablage ─────────────────────────────────────────────────
+         Pro Betrieb getrennt, damit zwei Dashboards auf einem Gerät sich nicht
+         gegenseitig überschreiben. Speicher kann fehlschlagen (privater Modus,
+         blockierte Cookies) — dann läuft alles nur für diese Sitzung. */
+      var ABLAGE = "telefonassistent_schluessel_" + slug;
+      function merken(wert, dauerhaft) {
+        try { (dauerhaft ? localStorage : sessionStorage).setItem(ABLAGE, wert); } catch (e) { /* egal */ }
+      }
+      function vergessen() {
+        try { localStorage.removeItem(ABLAGE); } catch (e) { /* egal */ }
+        try { sessionStorage.removeItem(ABLAGE); } catch (e) { /* egal */ }
+      }
+      function gemerkt() {
+        try { return localStorage.getItem(ABLAGE) || sessionStorage.getItem(ABLAGE) || ""; }
+        catch (e) { return ""; }
+      }
+
+      if (!slug) {
+        zeige("Dieser Link ist unvollständig. Bitte den Zugangslink verwenden, den Sie von uns erhalten haben.");
+        return;
+      }
+
+      // Steht der Schlüssel in der URL, übernehmen wir ihn und räumen die Adresszeile
+      // sofort auf — er soll nicht im Verlauf oder in Screenshots landen.
+      var key = params.get("key") || "";
+      if (key) {
+        merken(key, true);
+        try {
+          params.delete("key");
+          var rest = params.toString();
+          history.replaceState(null, "", location.pathname + (rest ? "?" + rest : ""));
+        } catch (e) { /* ohne History-API bleibt die URL stehen — unkritisch */ }
+      } else {
+        key = gemerkt();
+      }
+
+      function torZeigen(meldung) {
+        app.hidden = true;
+        statusEl.hidden = true;
+        gate.hidden = false;
+        gateFehler.hidden = !meldung;
+        if (meldung) gateFehler.innerHTML = ICON.warn + "<span>" + esc(meldung) + "</span>";
+        keyFeld.value = "";
+        keyFeld.focus();
+      }
+
+      var fmtZeit    = new Intl.DateTimeFormat("de-DE", { hour: "2-digit", minute: "2-digit" });
+      var fmtTagLang = new Intl.DateTimeFormat("de-DE", { weekday: "short", day: "2-digit", month: "2-digit" });
+      var fmtTagKurz = new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "2-digit" });
+
+      var ICON = {
+        bell:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>',
+        clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+        gauge: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14l4-4"/><path d="M3.5 18a9 9 0 1 1 17 0"/></svg>',
+        coin:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9.5a3 3 0 0 0-3-1.5c-1.7 0-3 1-3 2.2 0 3 6 1.5 6 4.6 0 1.2-1.3 2.2-3 2.2a3 3 0 0 1-3-1.5"/></svg>',
+        info:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></svg>',
+        up:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>',
+        down:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg>',
+        flat:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/></svg>',
+        warn:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>'
+      };
+
+      function esc(s) {
+        return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+        });
+      }
+      function minuten(sek) { return Math.round((sek || 0) / 60 * 10) / 10; }
+      function istOffen(a) { return a.rueckruf_wunsch && a.status !== "erledigt"; }
+      function ausserhalb(d) { var t = d.getDay(), h = d.getHours(); return t === 0 || t === 6 || h < 8 || h >= 18; }
+
+      // Aufgeklappter Inhalt — identisch für Anrufliste und Rückruf-Karten, damit
+      // beide dasselbe zeigen. Reihenfolge ist bewusst: erst die Zusammenfassung
+      // (das Wenige, das man liest), dann der vollständige Verlauf.
+      function detailBlock(a, d) {
+        var kopf = '<div class="kh">' + esc(fmtTagKurz.format(d)) + " · " + esc(fmtZeit.format(d)) +
+          (a.dauer_sekunden ? " · " + minuten(a.dauer_sekunden) + " min Gesprächsdauer" : "") +
+          (a.anrufer_nummer ? " · " + esc(a.anrufer_nummer) : "") + "</div>";
+        var zus = a.zusammenfassung
+          ? "<div><h3>Zusammenfassung</h3><div class=\"fazit\">" + esc(a.zusammenfassung) + "</div></div>"
+          : "";
+        var tr = a.transkript
+          ? '<div><h3>Wortlaut des Gesprächs</h3><div class="transkript">' + esc(a.transkript) + "</div></div>"
+          : "";
+        if (!zus && !tr) {
+          return '<div class="detail">' + kopf +
+            '<div class="kh">Zu diesem Anruf liegen keine Details vor.</div></div>';
+        }
+        return '<div class="detail">' + kopf + zus + tr + "</div>";
+      }
+      function initialen(name) {
+        return String(name || "").trim().replace(/[^A-Za-zÄÖÜäöüß ]/g, "").split(/\s+/)
+          .filter(Boolean).map(function (w) { return w[0]; }).slice(0, 2).join("").toUpperCase() || "·";
+      }
+      function plural(n, ein, viele) { return n === 1 ? ein : viele; }
+
+      /* ── Tooltip: ergänzt die Diagramme, ersetzt keinen Wert ─────────────── */
+      function tipAn(evt, html) {
+        tip.innerHTML = html;
+        tip.classList.add("on");
+        var b = tip.getBoundingClientRect();
+        var x = Math.min(Math.max(evt.clientX - b.width / 2, 8), innerWidth - b.width - 8);
+        var y = evt.clientY - b.height - 14;
+        if (y < 8) y = evt.clientY + 18;
+        tip.style.left = x + "px";
+        tip.style.top = y + "px";
+      }
+      function tipAus() { tip.classList.remove("on"); }
+      function tipBinden(wurzel) {
+        wurzel.querySelectorAll("[data-tip]").forEach(function (el) {
+          el.addEventListener("mousemove", function (e) { tipAn(e, el.getAttribute("data-tip")); });
+          el.addEventListener("mouseleave", tipAus);
+        });
+      }
+
+      /* ── Achsen-Ticks auf runde Zahlen ───────────────────────────────────── */
+      function nettoMax(max) {
+        if (max <= 4) return Math.max(max, 1);
+        var stufen = [5, 10, 20, 25, 50, 100, 200, 500, 1000];
+        for (var i = 0; i < stufen.length; i++) if (max <= stufen[i]) return stufen[i];
+        return Math.ceil(max / 1000) * 1000;
+      }
+      function ticks(max) {
+        var t = [0];
+        var schritt = max / (max <= 4 ? max : 4);
+        for (var v = schritt; v <= max + 1e-9; v += schritt) t.push(Math.round(v * 10) / 10);
+        return t;
+      }
+
+      /* ── Säulen: ≤24px, 4px Radius nur an der Kappe, Basis eckig ─────────── */
+      /* Die viewBox folgt der echten Breite. Sonst skaliert das SVG auf dem Handy
+         herunter und die Achsenbeschriftung schrumpft mit — bei 390px Display
+         landete sie bei gut 4 Pixeln und war schlicht nicht mehr lesbar. */
+      function breiteVon(zielId) {
+        var el = document.getElementById(zielId);
+        var b = el ? el.clientWidth : 0;
+        return Math.max(320, Math.min(760, b || 760));
+      }
+
+      function saeulenSVG(serie, einheit, W) {
+        W = W || 760;
+        var H = 250, padL = 34, padR = 12, padT = 26, padB = 26;
+        var n = serie.length;
+        var plotW = W - padL - padR, plotH = H - padT - padB, basis = padT + plotH;
+        var roh = Math.max.apply(null, serie.map(function (s) { return s.n; }).concat([0]));
+        var max = nettoMax(roh);
+        var band = plotW / n, bw = Math.min(24, Math.max(3, band - 8));
+        // Beschriftungsdichte an der verfügbaren Breite ausrichten, nicht an der Anzahl allein
+        var maxLabels = Math.max(4, Math.floor(W / 62));
+        var jedes = Math.ceil(n / maxLabels);
+        var p = ['<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(einheit) + ' je Zeitabschnitt">'];
+
+        ticks(max).forEach(function (v) {
+          var y = basis - (v / max) * plotH;
+          p.push('<line class="' + (v === 0 ? "axis" : "grid") + '" x1="' + padL + '" y1="' + y.toFixed(1) + '" x2="' + (W - padR) + '" y2="' + y.toFixed(1) + '"/>');
+          p.push('<text class="tick" x="' + (padL - 8) + '" y="' + (y + 4).toFixed(1) + '" text-anchor="end">' + v + '</text>');
+        });
+
+        serie.forEach(function (s, i) {
+          var cx = padL + band * i + band / 2, x = cx - bw / 2;
+          var h = s.n > 0 ? Math.max(4, (s.n / max) * plotH) : 2;
+          var y = basis - h, r = Math.min(4, h);
+          var d = s.n > 0
+            ? 'M' + x + ',' + basis + ' V' + (y + r) + ' Q' + x + ',' + y + ' ' + (x + r) + ',' + y +
+              ' H' + (x + bw - r) + ' Q' + (x + bw) + ',' + y + ' ' + (x + bw) + ',' + (y + r) + ' V' + basis + ' Z'
+            : 'M' + x + ',' + (basis - 2) + ' h' + bw + ' v2 h-' + bw + ' Z';
+          var text = '<b>' + esc(s.voll) + '</b><br>' + s.n + ' ' + esc(einheit);
+          p.push('<g class="band" data-tip="' + esc(text) + '">');
+          p.push('<rect class="hit" x="' + (padL + band * i) + '" y="' + padT + '" width="' + band + '" height="' + plotH + '"/>');
+          p.push('<path class="col' + (s.n ? "" : " zero") + '" d="' + d + '"/>');
+          // Sparsam beschriften: nur die Spitzenwerte. Alle Höchstwerte, sonst wirkt ein
+          // gleich hoher Nachbar ohne Zahl wie ein Fehler.
+          if (s.n === roh && s.n > 0) p.push('<text class="val" x="' + cx + '" y="' + (y - 7) + '" text-anchor="middle">' + s.n + '</text>');
+          if (i % jedes === 0) p.push('<text class="tick" x="' + cx + '" y="' + (basis + 17) + '" text-anchor="middle">' + esc(s.kurz) + '</text>');
+          p.push('</g>');
+        });
+        p.push('</svg>');
+        return p.join("");
+      }
+
+      /* ── Fläche + Linie: kumulierte Minuten, Endpunkt direkt beschriftet ─── */
+      function flaecheSVG(serie, W) {
+        W = W || 760;
+        var H = 220, padL = 40, padR = 56, padT = 24, padB = 26;
+        var n = serie.length;
+        if (n < 2) return "";
+        var plotW = W - padL - padR, plotH = H - padT - padB, basis = padT + plotH;
+        var kum = 0;
+        var punkte = serie.map(function (s, i) {
+          kum += s.n;
+          return { x: padL + (plotW * i) / (n - 1), v: Math.round(kum * 10) / 10, s: s };
+        });
+        var roh = punkte[punkte.length - 1].v;
+        var max = nettoMax(Math.ceil(roh));
+        punkte.forEach(function (pt) { pt.y = basis - (pt.v / max) * plotH; });
+
+        var linie = punkte.map(function (pt, i) { return (i ? "L" : "M") + pt.x.toFixed(1) + "," + pt.y.toFixed(1); }).join(" ");
+        var flaeche = linie + " L" + punkte[n - 1].x.toFixed(1) + "," + basis + " L" + punkte[0].x.toFixed(1) + "," + basis + " Z";
+        var letzte = punkte[n - 1];
+        var jedes = Math.ceil(n / Math.max(4, Math.floor(W / 62)));
+
+        var p = ['<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Kumulierte abgenommene Gesprächszeit in Minuten">'];
+        ticks(max).forEach(function (v) {
+          var y = basis - (v / max) * plotH;
+          p.push('<line class="' + (v === 0 ? "axis" : "grid") + '" x1="' + padL + '" y1="' + y.toFixed(1) + '" x2="' + (W - padR) + '" y2="' + y.toFixed(1) + '"/>');
+          p.push('<text class="tick" x="' + (padL - 8) + '" y="' + (y + 4).toFixed(1) + '" text-anchor="end">' + v + '</text>');
+        });
+        p.push('<path class="area" d="' + flaeche + '"/>');
+        p.push('<path class="line" d="' + linie + '"/>');
+
+        punkte.forEach(function (pt, i) {
+          var text = '<b>' + esc(pt.s.voll) + '</b><br>bis hier ' + pt.v + ' min';
+          var halb = plotW / (n - 1) / 2;
+          p.push('<g data-tip="' + esc(text) + '">');
+          p.push('<rect class="hit" x="' + Math.max(padL, pt.x - halb) + '" y="' + padT + '" width="' + Math.max(12, halb * 2) + '" height="' + plotH + '"/>');
+          p.push('</g>');
+          if (i % jedes === 0) p.push('<text class="tick" x="' + pt.x.toFixed(1) + '" y="' + (basis + 17) + '" text-anchor="middle">' + esc(pt.s.kurz) + '</text>');
+        });
+
+        p.push('<circle class="enddot" cx="' + letzte.x.toFixed(1) + '" cy="' + letzte.y.toFixed(1) + '" r="4.5"/>');
+        p.push('<text class="val" x="' + (letzte.x + 11) + '" y="' + (letzte.y + 4).toFixed(1) + '">' + letzte.v + ' min</text>');
+        p.push('</svg>');
+        return p.join("");
+      }
+
+      function meterSVG(anteil) {
+        var r = 56, c = 2 * Math.PI * r;
+        return '<svg viewBox="0 0 138 138" aria-hidden="true">' +
+          '<circle cx="69" cy="69" r="' + r + '" fill="none" stroke="var(--s1-track)" stroke-width="12"/>' +
+          (anteil > 0 ? '<circle cx="69" cy="69" r="' + r + '" fill="none" stroke="var(--s1)" stroke-width="12" ' +
+            'stroke-linecap="round" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + (c * (1 - anteil)).toFixed(1) + '"/>' : "") +
+          '</svg>';
+      }
+
+      function tabelle(serie, spalte, einheit) {
+        var kum = 0;
+        var zeilen = serie.map(function (s) {
+          kum += s.n;
+          return '<tr><td>' + esc(s.voll) + '</td><td class="num">' + s.n + '</td>' +
+            (einheit === "min" ? '<td class="num">' + (Math.round(kum * 10) / 10) + '</td>' : '') + '</tr>';
+        }).join("");
+        return '<div class="tv-scroll"><table class="tv"><thead><tr><th>Zeitabschnitt</th>' +
+          '<th class="num">' + esc(spalte) + '</th>' +
+          (einheit === "min" ? '<th class="num">kumuliert</th>' : '') +
+          '</tr></thead><tbody>' + zeilen + '</tbody></table></div>';
+      }
+
+      function kachel(icon, kv, kl, kh, chip) {
+        return '<div class="k"><div class="ico">' + (ICON[icon] || "") + '</div>' +
+          '<div class="kv">' + esc(kv) + '</div><div class="kl">' + esc(kl) + '</div>' +
+          (kh ? '<div class="kh">' + esc(kh) + '</div>' : "") + (chip || "") + '</div>';
+      }
+
+      /* Richtung × ob „mehr" gut ist. Status-Farben, immer mit Pfeil + Text. */
+      function chip(jetzt, vorher, hochIstGut, wort) {
+        if (vorher === 0 && jetzt === 0) return "";
+        var diff = jetzt - vorher;
+        if (diff === 0) return '<span class="chip flat">' + ICON.flat + ' unverändert</span>';
+        var gut = hochIstGut ? diff > 0 : diff < 0;
+        var vz = diff > 0 ? "+" : "−";
+        return '<span class="chip ' + (gut ? "up" : "down") + '">' + (diff > 0 ? ICON.up : ICON.down) +
+          ' ' + vz + Math.abs(Math.round(diff * 10) / 10) + ' ' + esc(wort) + '</span>';
+      }
+
+      /* ── Zeitraum-Raster: Tage bzw. Zwei-Stunden-Fenster ─────────────────── */
+      function raster(anrufe) {
+        var eimer = [];
+        if (range === "heute") {
+          // Voller Tag in Zwei-Stunden-Fenstern — kein Anruf darf aus dem Raster fallen.
+          for (var h = 0; h < 24; h += 2) {
+            eimer.push({ n: 0, min: 0, kurz: h + "h", voll: h + "–" + (h + 2) + " Uhr" });
+          }
+          anrufe.forEach(function (a) {
+            var d = new Date(a.created_at), i = Math.floor(d.getHours() / 2);
+            if (i >= 0 && i < eimer.length) { eimer[i].n++; eimer[i].min += (a.dauer_sekunden || 0) / 60; }
+          });
+        } else {
+          var tage = parseInt(range, 10), idx = {};
+          for (var i = tage - 1; i >= 0; i--) {
+            var d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - i);
+            var k = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+            idx[k] = eimer.length;
+            eimer.push({ n: 0, min: 0, kurz: fmtTagKurz.format(d), voll: fmtTagLang.format(d) });
+          }
+          anrufe.forEach(function (a) {
+            var d = new Date(a.created_at);
+            var k = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+            if (k in idx) { eimer[idx[k]].n++; eimer[idx[k]].min += (a.dauer_sekunden || 0) / 60; }
+          });
+        }
+        eimer.forEach(function (e) { e.min = Math.round(e.min * 10) / 10; });
+        return eimer;
+      }
+
+      /* ── Theme: der einzige Ort, an dem ein Kunde „sichtbar" wird ────────── */
+      function themeAnwenden(theme, betrieb) {
+        var wurzel = document.documentElement;
+        var map = {
+          farbe_primaer: "--brand",
+          farbe_primaer_dunkel: "--brand-deep",
+          farbe_soft: "--brand-soft-hell",
+          farbe_soft_dunkel: "--brand-soft-dunkel",
+          farbe_akzent: "--akzent",
+          serie_1: "--s1-hell",
+          serie_2: "--s2"
+        };
+        Object.keys(map).forEach(function (k) { if (theme[k]) wurzel.style.setProperty(map[k], theme[k]); });
+        // Ohne eigenen Dunkel-Schritt bleibt die Serie in beiden Modi gleich —
+        // besser als ein Standardblau, das neben einer fremden Marke fehl am Platz wäre.
+        var s1d = theme.serie_1_dunkel || theme.serie_1;
+        if (s1d) wurzel.style.setProperty("--s1-dunkel", s1d);
+        if (theme.schrift) wurzel.setAttribute("data-schrift", theme.schrift);
+
+        var name = theme.logo_text || betrieb || "Übersicht";
+        document.getElementById("logo").innerHTML = esc(name) + "<small>Telefonassistent</small>";
+        document.getElementById("brandDot").textContent = theme.initialen || initialen(name);
+        if (theme.claim) document.getElementById("untertitel").textContent = theme.claim;
+        document.title = (betrieb || "Ihr Betrieb") + " · Telefonassistent";
+      }
+
+      /* ── Zeichnen ────────────────────────────────────────────────────────── */
+      var trendSerie = [], zeitSerie = [];
+
+      function render(data) {
+        var anrufe = data.anrufe || [];
+        var vgl = data.vergleich || { anzahl: 0, selbst: 0, sekunden: 0 };
+        themeAnwenden(data.theme || {}, data.betrieb);
+
+        document.getElementById("liveTag").hidden = false;
+        document.getElementById("ranges").hidden = false;
+        document.getElementById("heroRow").hidden = false;
+
+        var gesamt = anrufe.length;
+        var selbst = anrufe.filter(function (a) { return a.selbst_beantwortet; }).length;
+        var uebergeben = gesamt - selbst;
+        var offen = anrufe.filter(istOffen).length;
+        var sekSumme = anrufe.reduce(function (s, a) { return s + (a.dauer_sekunden || 0); }, 0);
+        var quote = gesamt ? Math.round((selbst / gesamt) * 100) : 0;
+        var schnitt = gesamt ? Math.round((sekSumme / gesamt / 60) * 10) / 10 : 0;
+        var vglWort = range === "heute" ? "vs. gestern" : "vs. Vorperiode";
+
+        document.getElementById("heroVal").textContent = gesamt;
+        document.getElementById("heroDelta").innerHTML = gesamt || vgl.anzahl
+          ? '<span class="delta">' + chipRoh(gesamt, vgl.anzahl) + " " + esc(vglWort) + "</span>" : "";
+
+        var kacheln =
+          kachel("bell", offen, "Offene Rückrufe", offen ? "wartet auf Sie" : "alles erledigt") +
+          kachel("clock", minuten(sekSumme) + " min", "Abgenommene Gesprächszeit", "am Telefon übernommen",
+                 chip(minuten(sekSumme), minuten(vgl.sekunden), true, "min")) +
+          kachel("gauge", schnitt + " min", "Ø pro Anruf", "durchschnittliche Dauer");
+        if (data.admin) {
+          var kosten = anrufe.reduce(function (s, a) { return s + (Number(a.kosten_credits) || 0); }, 0);
+          kacheln += kachel("coin", kosten.toFixed(2), "Kosten (intern)", "nur Admin-Ansicht");
+        }
+        document.getElementById("kpi").innerHTML = kacheln;
+
+        var charts = document.getElementById("charts");
+        var leer = document.getElementById("charts-leer");
+        if (!gesamt) {
+          charts.hidden = true;
+          leer.hidden = false;
+          leer.textContent = range === "heute"
+            ? "Heute hat noch niemand angerufen. Sobald der erste Anruf eingeht, erscheint er hier — meist innerhalb weniger Minuten."
+            : "Im gewählten Zeitraum gab es keine Anrufe.";
+        } else {
+          charts.hidden = false;
+          leer.hidden = true;
+          zeichneDiagramme(anrufe, gesamt, selbst, uebergeben, quote);
+        }
+
+        var offene = anrufe.filter(istOffen);
+        var rrA = document.getElementById("rr-anzahl");
+        rrA.hidden = offene.length === 0;
+        rrA.textContent = offene.length + " offen";
+        document.getElementById("rr-leer").hidden = offene.length > 0;
+        document.getElementById("rueckrufe").innerHTML = offene.map(function (a) {
+          var rd = new Date(a.created_at);
+          return "<li><details><summary>" +
+            '<span class="wer">' + esc(a.anrufer_name && a.anrufer_name !== "-" ? a.anrufer_name : "Unbekannter Anrufer") + "</span>" +
+            '<span class="num">' + esc(a.anrufer_nummer || "") + "</span>" +
+            '<span class="was">' + esc(a.anliegen || "") + "</span>" +
+            '<span class="mehr"><span class="auf">Mehr Infos</span><span class="zu">Weniger</span></span>' +
+            '<button data-id="' + esc(a.id) + '">Als erledigt markieren</button>' +
+            "</summary>" + detailBlock(a, rd) + "</details></li>";
+        }).join("");
+
+        document.getElementById("calls-leer").hidden = gesamt > 0;
+        document.getElementById("calls").innerHTML = anrufe.map(function (a) {
+          var badge = a.selbst_beantwortet
+            ? '<span class="badge selbst">selbst beantwortet</span>'
+            : (istOffen(a) ? '<span class="badge offen">Rückruf offen</span>' : '<span class="badge erledigt">erledigt</span>');
+          var d = new Date(a.created_at);
+          return "<details><summary>" +
+            '<span class="zeit">' + esc(fmtTagKurz.format(d)) + " · " + esc(fmtZeit.format(d)) + "</span>" +
+            '<span class="wer">' + esc(a.anrufer_name && a.anrufer_name !== "-" ? a.anrufer_name : (a.anrufer_nummer || "Unbekannt")) +
+            (a.anliegen ? ' <span class="anl">— ' + esc(a.anliegen) + "</span>" : "") + "</span>" +
+            '<span class="dauer">' + (a.dauer_sekunden ? minuten(a.dauer_sekunden) + " min" : "") +
+            (data.admin && a.kosten_credits != null ? " · " + Number(a.kosten_credits).toFixed(2) + " Cr." : "") + "</span>" +
+            badge +
+            '<span class="mehr"><span class="auf">Mehr Infos</span><span class="zu">Weniger</span></span>' +
+            "</summary>" + detailBlock(a, d) + "</details>";
+        }).join("");
+
+        statusEl.hidden = true;
+        app.hidden = false;
+      }
+
+      function chipRoh(jetzt, vorher) {
+        var diff = jetzt - vorher;
+        if (diff === 0) return ICON.flat + " unverändert";
+        return (diff > 0 ? ICON.up : ICON.down) + " " + (diff > 0 ? "+" : "−") + Math.abs(diff);
+      }
+
+      function zeichneDiagramme(anrufe, gesamt, selbst, uebergeben, quote) {
+        document.getElementById("meter").innerHTML = meterSVG(gesamt ? selbst / gesamt : 0) +
+          '<div class="center"><div><b>' + quote + '%</b><span>direkt erledigt</span></div></div>';
+        document.getElementById("meterFacts").innerHTML =
+          '<div class="row"><span class="sw" style="background:var(--s1)"></span> Selbst beantwortet <b>' + selbst + "</b></div>" +
+          '<div class="row"><span class="sw" style="background:var(--s1-track)"></span> An Sie übergeben <b>' + uebergeben + "</b></div>" +
+          '<div class="row" style="color:var(--faint);font-size:.82rem">von ' + gesamt + " " + plural(gesamt, "Anruf", "Anrufen") + " im Zeitraum</div>";
+
+        var aus = anrufe.filter(function (a) { return ausserhalb(new Date(a.created_at)); }).length;
+        var innen = gesamt - aus;
+        // Zahl nur in das Segment schreiben, wenn sie mit Polsterung hineinpasst — sonst trägt sie die Legende.
+        function seg(cls, wert) {
+          if (!wert) return "";
+          var breit = wert / gesamt > 0.14;
+          return '<div class="seg ' + cls + '" style="flex:' + wert + '">' + (breit ? wert : "") + "</div>";
+        }
+        document.getElementById("split").innerHTML = seg("a", aus) + seg("b", innen);
+        document.getElementById("splitLegend").innerHTML =
+          '<div class="row"><span class="sw" style="background:var(--s1)"></span> Außerhalb der Bürozeiten <b>' + aus + "</b></div>" +
+          '<div class="row"><span class="sw" style="background:var(--s2)"></span> Während der Bürozeiten <b>' + innen + "</b></div>";
+        var ins = document.getElementById("reachInsight");
+        if (aus) {
+          ins.hidden = false;
+          ins.innerHTML = ICON.info + "<span>" + aus + " von " + gesamt + " " + plural(gesamt, "Anruf", "Anrufen") +
+            " kamen außerhalb der Bürozeiten — die wären sonst auf dem Anrufbeantworter gelandet oder verloren gegangen.</span>";
+        } else {
+          ins.hidden = true;
+        }
+
+        var eimer = raster(anrufe);
+        trendSerie = eimer.map(function (e) { return { n: e.n, kurz: e.kurz, voll: e.voll }; });
+        zeitSerie = eimer.map(function (e) { return { n: e.min, kurz: e.kurz, voll: e.voll }; });
+
+        var tt = document.getElementById("trendTitle"), tc = document.getElementById("trendCap");
+        if (range === "heute") {
+          tt.textContent = "Anrufe nach Tageszeit";
+          tc.textContent = "Zu welcher Uhrzeit heute angerufen wurde.";
+        } else {
+          tt.textContent = "Anrufe pro Tag";
+          tc.textContent = "So verteilen sich die Anrufe über die letzten " + parseInt(range, 10) + " Tage.";
+        }
+        document.getElementById("zeitCap").textContent = range === "heute"
+          ? "Wie sich die Minuten über den heutigen Tag summieren, die niemand bei Ihnen am Telefon verbringen musste."
+          : "Wie sich die Minuten über den Zeitraum summieren, die niemand bei Ihnen am Telefon verbringen musste.";
+
+        zeichneKarte("trend", "trendTv", saeulen, tabTrend);
+        zeichneKarte("zeit", "zeitTv", flaeche, tabZeit);
+      }
+
+      function saeulen() { return saeulenSVG(trendSerie, "Anrufe", breiteVon("trend")); }
+      function flaeche() { return flaecheSVG(zeitSerie, breiteVon("zeit")) || '<div class="leer-hinweis">Zu wenige Zeitpunkte für einen Verlauf.</div>'; }
+      function tabTrend() { return tabelle(trendSerie, "Anrufe", "n"); }
+      function tabZeit() { return tabelle(zeitSerie, "Minuten", "min"); }
+
+      function zeichneKarte(zielId, knopfId, svgFn, tabFn) {
+        var ziel = document.getElementById(zielId);
+        var knopf = document.getElementById(knopfId);
+        var tabelleAn = knopf.getAttribute("aria-pressed") === "true";
+        ziel.innerHTML = tabelleAn ? tabFn() : svgFn();
+        if (!tabelleAn) tipBinden(ziel);
+      }
+
+      /* ── Laden ───────────────────────────────────────────────────────────── */
+      // ── BEISPIELDATEN ────────────────────────────────────────────────────
+      // Frei erfunden. Kein echter Betrieb, keine echten Personen, keine
+      // Datenbank. Die Zeitstempel entstehen relativ zum Aufruf, damit die
+      // Seite nicht veraltet.
+      var DEMO_THEME = {
+        claim: "Ihre Mieter erreichen jemanden — auch wenn im Büro gerade niemand sitzt.",
+        schrift: "serif",
+        serie_1: "#3b7fc4",
+        serie_2: "#b8862b",
+        initialen: "HH",
+        logo_text: "Heimstein Hausverwaltung",
+        farbe_soft: "#e4ebf3",
+        farbe_akzent: "#c8a24b",
+        farbe_primaer: "#1e3f63",
+        serie_1_dunkel: "#4c8cce",
+        farbe_primaer_dunkel: "#14293f"
+      };
+
+      // Anliegen einer Hausverwaltung. rw = Rückrufwunsch, s = Dauer in Sekunden.
+      var DEMO_VORLAGEN = [
+        { n: "Marion Kessler",     t: "+49 831 44••••", a: "Heizung im Bad wird nicht warm", rw: true,  s: 120,
+          z: "Die Mieterin meldet, dass die Heizung im Bad kalt bleibt, während die übrigen Räume warm werden. Aufgenommen: Adresse, Rückrufnummer, seit wann es auftritt. Als technischen Defekt eingeordnet und einen Rückruf angekündigt — ohne Termin oder Kostenübernahme zuzusagen." },
+        { n: "Thomas Bergmann",    t: "+49 831 22••••", a: "Frage zur Betriebskostenabrechnung", rw: false, s: 90,
+          z: "Wollte wissen, bis wann die Abrechnung kommt und wohin Rückfragen gehen. Zeitraum und zuständige Adresse genannt. Kein Rückruf nötig." },
+        { n: "Sabine Roth",        t: "+49 831 77••••", a: "Wasseraustritt im Kellerabteil", rw: true,  s: 174,
+          z: "Meldet austretendes Wasser im Kellerabteil. Als dringend eingestuft, Adresse und Erreichbarkeit aufgenommen, sofortigen Rückruf angekündigt. Hat den Hinweis bekommen, den Haupthahn zu schließen, falls es stärker wird." },
+        { n: "Renate Simon",       t: "+49 831 31••••", a: "Frage nach den Sprechzeiten", rw: false, s: 42,
+          z: "Fragte nach den Sprechzeiten des Büros. Zeiten genannt, dazu den Hinweis auf die Terminvereinbarung. Anliegen vollständig geklärt." },
+        { n: "Elektro Wenz GmbH",  t: "+49 831 90••••", a: "Terminabsprache Rauchmelderprüfung", rw: false, s: 66,
+          z: "Handwerksbetrieb wollte einen Termin für die jährliche Rauchmelderprüfung abstimmen. Gewünschte Zeitfenster und Ansprechpartner aufgenommen und weitergegeben." },
+        { n: "Klaus Vetter",       t: "+49 831 58••••", a: "Abholtermin der Papiertonne", rw: false, s: 54,
+          z: "Fragte, warum die Papiertonne nicht geleert wurde. Auf den geänderten Abfuhrtag hingewiesen und den nächsten Termin genannt." },
+        { n: "Birgit Ammann",      t: "+49 831 65••••", a: "Zuständigkeit für die Gartenpflege", rw: false, s: 71,
+          z: "Wollte wissen, wer für den Heckenschnitt zuständig ist. Regelung aus der Hausordnung erläutert, keine Zusage gemacht." },
+        { n: "Stefan Merk",        t: "+49 831 19••••", a: "Rückzahlung der Kaution nach Auszug", rw: true,  s: 98,
+          z: "Fragt nach dem Stand der Kautionsrückzahlung sechs Wochen nach Auszug. Vorgang aufgenommen und an die Verwaltung übergeben; keine Frist zugesagt." },
+        { n: "Unbekannter Anrufer", t: "+49 176 33••••", a: "Interesse an Mietwohnung Ludwigstraße", rw: true, s: 144,
+          z: "Interessentin fragte nach einer freien Zwei-Zimmer-Wohnung. Aktuell ist keine frei; Kontaktdaten für die Warteliste aufgenommen, Rückruf bei Verfügbarkeit angekündigt." },
+        { n: "Andrea Pfeifer",     t: "+49 831 27••••", a: "Defekte Beleuchtung im Treppenhaus", rw: true,  s: 83,
+          z: "Meldet, dass das Licht im zweiten Obergeschoss ausgefallen ist. Adresse und Stockwerk aufgenommen, an den Hausmeisterdienst übergeben." },
+        { n: "Jürgen Haas",        t: "+49 831 84••••", a: "Lärmbeschwerde Nachbarwohnung", rw: true,  s: 156,
+          z: "Beschwert sich über wiederholte nächtliche Ruhestörung. Sachverhalt und Zeitpunkte protokolliert, persönlichen Rückruf angekündigt. Bewusst keine Bewertung des Falls abgegeben." },
+        { n: "Petra Lindner",      t: "+49 831 46••••", a: "Ummeldung nach Mieterwechsel", rw: false, s: 77,
+          z: "Fragte, welche Unterlagen die Verwaltung nach einem Mieterwechsel braucht. Liste genannt und auf das Formular auf der Website verwiesen." },
+        { n: "Michael Sturm",      t: "+49 831 52••••", a: "Stellplatz wird zugeparkt", rw: false, s: 61,
+          z: "Meldet einen wiederholt zugeparkten Stellplatz. Kennzeichen und Zeitpunkte aufgenommen, Vorgang an die Verwaltung weitergegeben." },
+        { n: "Gabriele Ostermann", t: "+49 831 38••••", a: "Termin für die Wohnungsabnahme", rw: true,  s: 112,
+          z: "Möchte die Wohnungsabnahme zum Monatsende vereinbaren. Wunschtermine aufgenommen und Rückruf zur Bestätigung angekündigt." }
+      ];
+
+      // Anrufe je Tag, Index 0 = heute (fest, damit die Zahlen stabil bleiben).
+      // 60 Tage, weil auch „30 Tage" eine gefüllte Vorperiode zum Vergleichen
+      // braucht — sonst stünde dort ein sinnloses „+113 vs. Vorperiode".
+      // Die zweiten 30 Tage liegen niedriger: der Betrieb wächst.
+      var DEMO_PRO_TAG = [9,5,4,6,3,2,2,5,6,4,5,3,2,1,6,5,4,4,3,2,2,5,4,5,3,3,2,1,4,3,
+                          4,3,4,5,2,2,1,4,5,3,4,2,2,1,5,4,3,3,2,2,1,4,3,4,2,2,2,1,3,2];
+
+      // Uhrzeiten: bewusst mit Randzeiten, damit „außerhalb der Bürozeiten" trägt.
+      var DEMO_STUNDEN = [8,10,13,16,7,19,11,21,9,14,17,6,12,15,22,18];
+
+      var DEMO_ALLE = (function () {
+        var liste = [];
+        var lfd = 1;
+        for (var tag = 0; tag < DEMO_PRO_TAG.length; tag++) {
+          for (var i = 0; i < DEMO_PRO_TAG[tag]; i++) {
+            var v = DEMO_VORLAGEN[(tag * 3 + i * 5) % DEMO_VORLAGEN.length];
+            var std = DEMO_STUNDEN[(tag + i * 3) % DEMO_STUNDEN.length];
+            var d = new Date();
+            d.setDate(d.getDate() - tag);
+            d.setHours(std, (i * 17 + tag * 7) % 60, 0, 0);
+            // Nur Vergangenes zeigen — sonst stünden „heute" Anrufe aus der Zukunft.
+            if (d > new Date()) continue;
+            // Ein Rückruf gilt als erledigt, sobald er älter als zwei Tage ist.
+            var offen = v.rw && tag <= 2;
+            liste.push({
+              id: lfd++,
+              anrufer_name: v.n,
+              anrufer_nummer: v.t,
+              anliegen: v.a,
+              zusammenfassung: v.z,
+              transkript: null,
+              rueckruf_wunsch: v.rw,
+              status: offen ? "offen" : (v.rw ? "erledigt" : null),
+              selbst_beantwortet: !v.rw,
+              dauer_sekunden: v.s + ((tag * 11 + i * 13) % 25) - 12,
+              kosten_credits: 0,
+              created_at: d.toISOString()
+            });
+          }
+        }
+        return liste.sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
+      })();
+
+      function demoFenster(r) {
+        var von = new Date();
+        if (r === "heute") { von.setHours(0, 0, 0, 0); return { von: von, tage: 1 }; }
+        var tage = r === "7" ? 7 : 30;
+        von.setDate(von.getDate() - tage);
+        return { von: von, tage: tage };
+      }
+
+      // Ersetzt die Netzabfrage: filtert den eingebauten Datensatz und rendert.
+      function laden() {
+        gate.hidden = true;
+        var f = demoFenster(range);
+        var vorVon = new Date(f.von);
+        vorVon.setDate(vorVon.getDate() - f.tage);
+
+        var imZeitraum = DEMO_ALLE.filter(function (a) { return new Date(a.created_at) >= f.von; });
+        var davor = DEMO_ALLE.filter(function (a) {
+          var d = new Date(a.created_at);
+          return d >= vorVon && d < f.von;
+        });
+
+        render({
+          betrieb: "Heimstein Hausverwaltung",
+          theme: DEMO_THEME,
+          anrufe: imZeitraum,
+          vergleich: {
+            anzahl: davor.length,
+            selbst: davor.filter(function (a) { return a.selbst_beantwortet; }).length,
+            sekunden: davor.reduce(function (s, a) { return s + (a.dauer_sekunden || 0); }, 0)
+          }
+        });
+        var ab = document.getElementById("abmeldenBtn");
+        if (ab) ab.hidden = true;
+      }
+
+      document.getElementById("ranges").addEventListener("click", function (e) {
+        var b = e.target.closest("button[data-range]");
+        if (!b || b.getAttribute("aria-pressed") === "true") return;
+        range = b.dataset.range;
+        document.querySelectorAll("#ranges button").forEach(function (x) {
+          x.setAttribute("aria-pressed", String(x === b));
+        });
+        tipAus();
+        laden();
+      });
+
+      [["trendTv", "trend", saeulen, tabTrend], ["zeitTv", "zeit", flaeche, tabZeit]].forEach(function (cfg) {
+        document.getElementById(cfg[0]).addEventListener("click", function () {
+          var an = this.getAttribute("aria-pressed") === "true";
+          this.setAttribute("aria-pressed", String(!an));
+          this.textContent = an ? "Tabelle" : "Diagramm";
+          tipAus();
+          zeichneKarte(cfg[1], cfg[0], cfg[2], cfg[3]);
+        });
+      });
+
+      document.getElementById("rueckrufe").addEventListener("click", function (e) {
+        var b = e.target.closest("button[data-id]");
+        if (!b) return;
+        // Der Knopf sitzt im <summary>: ohne das würde ein Klick die Karte auf-
+        // oder zuklappen, während der Rückruf abgehakt wird.
+        e.preventDefault();
+        // Demo-Seite: nur lokal abhaken, es gibt keine Datenbank dahinter.
+        e.preventDefault();
+        var eintrag = DEMO_ALLE.filter(function (a) { return String(a.id) === String(b.dataset.id); })[0];
+        if (eintrag) eintrag.status = "erledigt";
+        laden();
+      });
+
+      gate.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var eingabe = keyFeld.value.trim();
+        if (!eingabe) {
+          gateFehler.hidden = false;
+          gateFehler.innerHTML = ICON.warn + "<span>Bitte tragen Sie Ihren Zugangsschlüssel ein.</span>";
+          keyFeld.focus();
+          return;
+        }
+        var losBtn = document.getElementById("losBtn");
+        losBtn.disabled = true;
+        losBtn.textContent = "Einen Moment …";
+        key = eingabe;
+        merken(key, document.getElementById("merkenBox").checked);
+        laden();
+        setTimeout(function () { losBtn.disabled = false; losBtn.textContent = "Übersicht öffnen"; }, 400);
+      });
+
+      document.getElementById("zeigenBtn").addEventListener("click", function () {
+        var an = keyFeld.type === "text";
+        keyFeld.type = an ? "password" : "text";
+        this.setAttribute("aria-pressed", String(!an));
+        this.textContent = an ? "Zeigen" : "Verbergen";
+        keyFeld.focus();
+      });
+
+      document.getElementById("abmeldenBtn").addEventListener("click", function () {
+        vergessen();
+        key = "";
+        torZeigen("");
+      });
+
+      addEventListener("scroll", tipAus, { passive: true });
+
+      // Beim Drehen/Ändern der Breite neu zeichnen, damit die viewBox wieder passt.
+      var neuzeichnen;
+      addEventListener("resize", function () {
+        if (app.hidden || !trendSerie.length) return;
+        clearTimeout(neuzeichnen);
+        neuzeichnen = setTimeout(function () {
+          tipAus();
+          zeichneKarte("trend", "trendTv", saeulen, tabTrend);
+          zeichneKarte("zeit", "zeitTv", flaeche, tabZeit);
+        }, 150);
+      }, { passive: true });
+
+      laden();
+    })();
+  </script>
+</body>
+</html>
